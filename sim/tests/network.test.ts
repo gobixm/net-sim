@@ -1,17 +1,22 @@
+import { NetworkEvent } from './../src/history';
 import { Timeline } from './../src/timeline';
 import { Network } from './../src/network';
 import { Node } from './../src/node';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
+import { NetworkHistory } from '../src/history';
 
 describe('network', () => {
     it('start subscribes to timeline', () => {
         const timeline = sinon.createStubInstance(Timeline);
-        const network = new Network(timeline as unknown as Timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
 
         network.start();
 
-        expect(timeline.subscribeTick.called).true
+        expect(timeline.subscribeTick.called).true;
     });
 
     it('stop unsubscribes from timeline', () => {
@@ -19,12 +24,15 @@ describe('network', () => {
         timeline.subscribeTick.returns(() => {
             //do nothing
         });
-        const network = new Network(timeline as unknown as Timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
         network.start();
 
         network.stop();
 
-        expect(timeline.unsubscribeTick.called).true
+        expect(timeline.unsubscribeTick.called).true;
     });
 
     it('start twice - single subscribe to timeline', () => {
@@ -32,12 +40,15 @@ describe('network', () => {
         timeline.subscribeTick.returns(() => {
             //do nothing
         });
-        const network = new Network(timeline as unknown as Timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
 
         network.start();
         network.start();
 
-        expect(timeline.subscribeTick.calledOnce).true
+        expect(timeline.subscribeTick.calledOnce).true;
     });
 
     it('stop without start not unsubscribes', () => {
@@ -45,19 +56,25 @@ describe('network', () => {
         timeline.subscribeTick.returns(() => {
             //do nothing
         });
-        const network = new Network(timeline as unknown as Timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
 
         network.stop();
         network.stop();
 
-        expect(timeline.unsubscribeTick.notCalled).true
+        expect(timeline.unsubscribeTick.notCalled).true;
     });
 
     it('sendPacket packet created', () => {
         const timeline = new Timeline();
         const sender = sinon.createStubInstance(Node);
         const receiver = sinon.createStubInstance(Node);
-        const network = new Network(timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
         network.start();
         network.registerNode(sender);
         timeline.tick(111);
@@ -65,14 +82,14 @@ describe('network', () => {
         const packet = network.sendPacket<string>('msg', 'body', sender as unknown as Node<string>, receiver as unknown as Node<string>);
         timeline.tick(100);
         const otherPacket = network.sendPacket<string>('msg', 'body', sender as unknown as Node<string>, receiver as unknown as Node<string>);
-        
+
         expect(packet.type).equals('msg');
         expect(packet.body).equals('body');
         expect(packet.metadata.id).equals(0);
         expect(packet.metadata.sender).equals(sender);
         expect(packet.metadata.receiver).equals(receiver);
         expect(packet.metadata.sentAt).equals(111);
-        
+
         expect(otherPacket.metadata.id).equals(1);
         expect(otherPacket.metadata.sentAt).equals(211);
     });
@@ -80,7 +97,10 @@ describe('network', () => {
     it('sendPacket registered node, packet processed', () => {
         const timeline = new Timeline();
         const node = sinon.createStubInstance(Node);
-        const network = new Network(timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
         network.start();
         network.registerNode(node);
 
@@ -93,7 +113,10 @@ describe('network', () => {
     it('sendPacket no registered node, packet skipped', () => {
         const timeline = new Timeline();
         const node = sinon.createStubInstance(Node);
-        const network = new Network(timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
         network.start();
 
         const packet = network.sendPacket<string>('msg', 'body', node as unknown as Node<string>, node as unknown as Node<string>);
@@ -105,7 +128,10 @@ describe('network', () => {
     it('sendPacket too early, packet skipped', () => {
         const timeline = new Timeline();
         const node = sinon.createStubInstance(Node);
-        const network = new Network(timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
         network.start();
         network.registerNode(node);
 
@@ -118,7 +144,10 @@ describe('network', () => {
     it('sendPacket multiple packets processed', () => {
         const timeline = new Timeline();
         const node = sinon.createStubInstance(Node);
-        const network = new Network(timeline);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
         network.start();
         network.registerNode(node);
 
@@ -134,9 +163,12 @@ describe('network', () => {
     it('unregisterNode packet lost', () => {
         const timeline = new Timeline();
         const node = sinon.createStubInstance(Node);
-        sinon.replaceGetter(node, 'id', () => 'the id')
+        const history = sinon.createStubInstance(NetworkHistory);
+        sinon.replaceGetter(node, 'id', () => 'the id');
 
-        const network = new Network(timeline);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
         network.start();
         network.registerNode(node);
         const packet = network.sendPacket<string>('msg', 'body', node as unknown as Node<string>, node as unknown as Node<string>);
@@ -145,5 +177,23 @@ describe('network', () => {
         timeline.tick(packet.metadata.latency);
 
         expect(node.processPacket.notCalled).true;
+    });
+
+    it('sendPacket history updated', () => {
+        const timeline = new Timeline();
+        const node = sinon.createStubInstance(Node);
+        sinon.replaceGetter(node, 'state', () => 'the state');
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
+        network.start();
+        network.registerNode(node);
+
+        const packet = network.sendPacket<string>('msg', 'body', node as unknown as Node<string>, node as unknown as Node<string>);
+        timeline.tick(packet.metadata.latency);
+
+        expect(history.add.calledWithMatch({ type: 'send', nodeState: 'the state' } as NetworkEvent)).true;
+        expect(history.add.calledWithMatch({ type: 'receive' } as NetworkEvent)).true;
     });
 });

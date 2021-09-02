@@ -1,7 +1,9 @@
+import { NetworkHistory } from './history';
 import { INode } from "./node";
 import { Packet, PacketMetadata } from "./packet";
 import { Time } from "./time";
 import { TickUnsubscribee, Timeline } from "./timeline";
+import { deepClone } from './utils';
 
 export class Network {
     private _packetCounter = 0;
@@ -9,7 +11,9 @@ export class Network {
     private _nodes = new Map<string, INode>();
     private _tickSubscription: TickUnsubscribee | undefined = undefined;
 
-    constructor(private _timeline: Timeline) {
+    constructor(
+        private _timeline: Timeline,
+        private _history: NetworkHistory) {
     }
 
     start(): void {
@@ -39,17 +43,22 @@ export class Network {
             receiver: receiver,
             sender: sender,
             sentAt: this._timeline.time
-        }
+        };
 
         const packet = new Packet<T>(type, body, meta);
         this.addInflight(packet);
+        this._history.add({
+            type: 'send',
+            packet: packet,
+            nodeState: deepClone(sender.state)
+        });
         return packet;
     }
 
     private getLatency(): Time {
         const max = 500;
         const min = 50;
-        return Math.floor(Math.random() * (max - min + 1) + min)
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     private addInflight<T>(packet: Packet<T>) {
@@ -60,9 +69,9 @@ export class Network {
         this._inflightPackets.delete(id);
     }
 
-    private onTick(time: Time) {        
+    private onTick(time: Time) {
         this._inflightPackets.forEach((packet, id) => {
-            if(packet.metadata.sentAt + packet.metadata.latency <= time) {
+            if (packet.metadata.sentAt + packet.metadata.latency <= time) {
                 this.onPacketReceived(packet);
                 this.removeInflight(id);
             }
@@ -71,10 +80,16 @@ export class Network {
 
     private onPacketReceived(packet: Packet<unknown>): void {
         const node = this._nodes.get(packet.metadata.receiver.id);
-        if(!node){
+        if (!node) {
             return;
         }
 
         node.processPacket(packet);
+
+        this._history.add({
+            type: 'receive',
+            packet: packet,
+            nodeState: deepClone(node.state)
+        });
     }
 }

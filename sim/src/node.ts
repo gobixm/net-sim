@@ -1,23 +1,28 @@
 import { Network } from './network';
 import { Packet } from './packet';
-export interface INode {    
+export interface INode {
     id: string;
     processPacket: (packet: Packet<unknown>) => void;
+    state: unknown;
 }
 
 export type PacketHandler<TContext, TBody> = (packet: Packet<TBody>, context: TContext) => TContext;
 
-export class Node<TContext> implements INode {
-    private _handlers = new Map<string, PacketHandler<TContext, unknown>>();
+export class Node<TState> implements INode {
+    private _handlers = new Map<string, PacketHandler<TState, unknown>>();
 
     get id(): string {
         return this._id;
     }
 
+    get state(): TState {
+        return this._state;
+    }
+
     constructor(
         private _id: string,
         private _network: Network,
-        private _context: TContext
+        private _state: TState
     ) {
 
     }
@@ -27,16 +32,16 @@ export class Node<TContext> implements INode {
     }
 
     processPacket(packet: Packet<unknown>): void {
-        const handler = this._handlers.get(packet.type)
+        const handler = this._handlers.get(packet.type);
         if (!handler) {
             return;
         }
 
-        handler(packet, this._context);
+        handler(packet, this._state);
     }
 
-    registerHandler<TBody>(type: string, handler: PacketHandler<TContext, TBody>): void {
-        this._handlers.set(type, (packet, context) => this._context = handler(<Packet<TBody>>packet, context));
+    registerHandler<TBody>(type: string, handler: PacketHandler<TState, TBody>): void {
+        this._handlers.set(type, (packet, context) => this._state = handler(<Packet<TBody>>packet, context));
     }
 
     unregisterHandler(type: string): void {
