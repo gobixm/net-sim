@@ -1,5 +1,5 @@
 import { Time } from './time';
-import { INode } from "./node"
+import { INode } from './node';
 
 export interface PacketMetadata {
     id: number,

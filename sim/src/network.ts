@@ -1,15 +1,34 @@
 import { NetworkHistory } from './history';
-import { INode } from "./node";
-import { Packet, PacketMetadata } from "./packet";
-import { Time } from "./time";
-import { TickUnsubscribee, Timeline } from "./timeline";
+import { INode } from './node';
+import { Packet, PacketMetadata } from './packet';
+import { Time } from './time';
+import { TickUnsubscribe, Timeline } from './timeline';
 import { deepClone } from './utils';
+
+export type NetworkNodeEventType = 'reg' | 'unreg';
+export type NetworkNodeCallback = (event: NetworkNodeEvent) => void;
+
+export type NetworkPacketEventType = 'sent' | 'received';
+export type NetworkPacketCallback = (event: NetworkPacketEvent) => void;
+
+export interface NetworkNodeEvent {
+    type: NetworkNodeEventType;
+    node: INode;
+}
+
+export interface NetworkPacketEvent {
+    type: NetworkPacketEventType;
+    packet: Packet<unknown>;
+}
 
 export class Network {
     private _packetCounter = 0;
     private _inflightPackets = new Map<number, Packet<unknown>>();
     private _nodes = new Map<string, INode>();
-    private _tickSubscription: TickUnsubscribee | undefined = undefined;
+    private _tickUnsubscribe: TickUnsubscribe | undefined = undefined;
+
+    private _nodesSubscriptions = new Set<(event: NetworkNodeEvent) => void>();
+    private _packetsSubscriptions = new Set<(event: NetworkPacketEvent) => void>();
 
     constructor(
         private _timeline: Timeline,
@@ -17,23 +36,30 @@ export class Network {
     }
 
     start(): void {
-        if (!this._tickSubscription) {
-            this._tickSubscription = this._timeline.subscribeTick((tick) => this.onTick(tick));
+        if (!this._tickUnsubscribe) {
+            this._tickUnsubscribe = this._timeline.subscribeTick((tick) => this.onTick(tick));
         }
     }
 
     stop(): void {
-        if (this._tickSubscription) {
-            this._timeline.unsubscribeTick(this._tickSubscription);
+        if (this._tickUnsubscribe) {
+            this._tickUnsubscribe();
         }
     }
 
     registerNode(node: INode): void {
         this._nodes.set(node.id, node);
+        this.notifyNode('reg', node);
     }
 
     unregisterNode(id: string): void {
+        const node = this._nodes.get(id);
+        if (!node) {
+            return;
+        }
+
         this._nodes.delete(id);
+        this.notifyNode('unreg', node);
     }
 
     sendPacket<T>(type: string, body: T, sender: INode, receiver: INode): Packet<T> {
@@ -52,7 +78,18 @@ export class Network {
             packet: packet,
             nodeState: deepClone(sender.state)
         });
+        this.notifyPacket('sent', packet);
         return packet;
+    }
+
+    subscribeNodes(callback: NetworkNodeCallback): () => void {
+        this._nodesSubscriptions.add(callback);
+        return () => this._nodesSubscriptions.delete(callback);
+    }
+
+    subscribePackets(callback: NetworkPacketCallback): () => void {
+        this._packetsSubscriptions.add(callback);
+        return () => this._packetsSubscriptions.delete(callback);
     }
 
     private getLatency(): Time {
@@ -74,6 +111,7 @@ export class Network {
             if (packet.metadata.sentAt + packet.metadata.latency <= time) {
                 this.onPacketReceived(packet);
                 this.removeInflight(id);
+                this.notifyPacket('received', packet);
             }
         });
     }
@@ -91,5 +129,19 @@ export class Network {
             packet: packet,
             nodeState: deepClone(node.state)
         });
+    }
+
+    private notifyPacket(event: NetworkPacketEventType, packet: Packet<unknown>) {
+        this._packetsSubscriptions.forEach(callback => callback({
+            type: event,
+            packet: packet
+        }));
+    }
+
+    private notifyNode(event: NetworkNodeEventType, node: INode) {
+        this._nodesSubscriptions.forEach(callback => callback({
+            type: event,
+            node: node
+        }));
     }
 }

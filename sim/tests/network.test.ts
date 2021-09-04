@@ -1,6 +1,6 @@
 import { NetworkEvent } from './../src/history';
 import { Timeline } from './../src/timeline';
-import { Network } from './../src/network';
+import { Network, NetworkNodeCallback, NetworkPacketCallback } from './../src/network';
 import { Node } from './../src/node';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
@@ -21,9 +21,10 @@ describe('network', () => {
 
     it('stop unsubscribes from timeline', () => {
         const timeline = sinon.createStubInstance(Timeline);
-        timeline.subscribeTick.returns(() => {
-            //do nothing
+        const dispose = sinon.fake(() => {
+            // stub
         });
+        timeline.subscribeTick.returns(dispose);
         const history = sinon.createStubInstance(NetworkHistory);
         const network = new Network(
             timeline as unknown as Timeline,
@@ -32,7 +33,7 @@ describe('network', () => {
 
         network.stop();
 
-        expect(timeline.unsubscribeTick.called).true;
+        expect(dispose.calledOnce).true;
     });
 
     it('start twice - single subscribe to timeline', () => {
@@ -53,9 +54,10 @@ describe('network', () => {
 
     it('stop without start not unsubscribes', () => {
         const timeline = sinon.createStubInstance(Timeline);
-        timeline.subscribeTick.returns(() => {
-            //do nothing
+        const dispose = sinon.fake(() => {
+            // stub
         });
+        timeline.subscribeTick.returns(dispose);
         const history = sinon.createStubInstance(NetworkHistory);
         const network = new Network(
             timeline as unknown as Timeline,
@@ -64,7 +66,7 @@ describe('network', () => {
         network.stop();
         network.stop();
 
-        expect(timeline.unsubscribeTick.notCalled).true;
+        expect(dispose.notCalled).true;
     });
 
     it('sendPacket packet created', () => {
@@ -195,5 +197,53 @@ describe('network', () => {
 
         expect(history.add.calledWithMatch({ type: 'send', nodeState: 'the state' } as NetworkEvent)).true;
         expect(history.add.calledWithMatch({ type: 'receive' } as NetworkEvent)).true;
+    });
+
+    it('subscribeNodes callbacks called', () => {
+        const timeline = new Timeline();
+        const node = sinon.createStubInstance(Node);
+        const history = sinon.createStubInstance(NetworkHistory);
+        sinon.replaceGetter(node, 'id', () => 'the id');
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
+        network.start();
+
+        const nodeCallback = sinon.fake(() => {
+            //do nothing
+        });
+
+        const dispose = network.subscribeNodes(nodeCallback as NetworkNodeCallback);
+
+        network.registerNode(node);
+        network.unregisterNode(node.id);
+        network.unregisterNode(node.id);
+        dispose();
+        expect(nodeCallback.calledWith({ type: 'reg', node: node })).true;
+        expect(nodeCallback.calledWith({ type: 'unreg', node: node })).true;
+        expect(nodeCallback.callCount).equals(2);
+    });
+
+    it('subscribePackets callbacks called', () => {
+        const timeline = new Timeline();
+        const node = sinon.createStubInstance(Node);
+        const history = sinon.createStubInstance(NetworkHistory);
+        sinon.replaceGetter(node, 'id', () => 'the id');
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
+        network.start();
+        const packetCallback = sinon.fake(() => {
+            //do nothing
+        });
+
+        const dispose = network.subscribePackets(packetCallback as NetworkPacketCallback);
+
+        const packet = network.sendPacket<string>('msg', 'body', node as unknown as Node<string>, node as unknown as Node<string>);
+        timeline.tick(packet.metadata.latency);
+
+        dispose();
+        expect(packetCallback.calledWith({ type: 'sent', packet: packet })).true;
+        expect(packetCallback.calledWith({ type: 'received', packet: packet })).true;
     });
 });

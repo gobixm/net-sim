@@ -56,12 +56,12 @@ describe('node', () => {
         let calledContext = undefined;
         node.registerHandler<string>('request', (packet, context) => {
             calledPacket = packet;
-            calledContext = context
+            calledContext = context;
             return context;
         });
 
         node.processPacket(packet);
-        expect(calledPacket).undefined
+        expect(calledPacket).undefined;
         expect(calledContext).undefined;
     });
 
@@ -81,14 +81,14 @@ describe('node', () => {
         let calledContext = undefined;
         node.registerHandler<string>('request', (packet, context) => {
             calledPacket = packet;
-            calledContext = context
+            calledContext = context;
             return context;
         });
 
         node.unregisterHandler('request');
 
         node.processPacket(packet);
-        expect(calledPacket).undefined
+        expect(calledPacket).undefined;
         expect(calledContext).undefined;
     });
 

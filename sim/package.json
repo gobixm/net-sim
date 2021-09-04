@@ -2,8 +2,8 @@
   "name": "sim",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "files": [
     "/dist"
   ],
@@ -12,7 +12,7 @@
     "build": "npx tsc",
     "test": "mocha -r ts-node/register tests/**/*.test.ts",
     "coverage": "nyc -r lcov -e .ts -x \"**/*.test.ts\" npm run test",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --fix --ext .ts"
   },
   "keywords": [],
   "author": "Kirill Ivanov",

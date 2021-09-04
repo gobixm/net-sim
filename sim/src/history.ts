@@ -1,4 +1,4 @@
-import { Packet } from "./packet";
+import { Packet } from './packet';
 
 export interface NetworkEvent {
     type: 'send' | 'receive';

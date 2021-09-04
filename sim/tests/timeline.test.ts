@@ -1,6 +1,6 @@
-import { expect } from "chai";
-import { Time } from "../src/time";
-import { TickCallback, Timeline } from "../src/timeline";
+import { expect } from 'chai';
+import { Time } from '../src/time';
+import { TickCallback, Timeline } from '../src/timeline';
 
 describe('timeline', () => {
     it('tick increases timeline', () => {
@@ -16,7 +16,7 @@ describe('timeline', () => {
         const timeline = new Timeline();
         const duration: Time = 10;
         let elapsed = 0;
-        const callback: TickCallback = (d: Time) => { elapsed = d };
+        const callback: TickCallback = (d: Time) => { elapsed = d; };
 
         timeline.subscribeTick(callback);
         timeline.tick(duration);
@@ -24,14 +24,14 @@ describe('timeline', () => {
         expect(elapsed).equal(duration);
     });
 
-    it('unsubscribeTick callback not called', () => {
+    it('unsubscribe callback not called', () => {
         const timeline = new Timeline();
         const duration: Time = 10;
         let elapsed = 0;
-        const callback: TickCallback = (d: Time) => { elapsed = d };
-        const handler = timeline.subscribeTick(callback);
+        const callback: TickCallback = (d: Time) => { elapsed = d; };
+        const dispose = timeline.subscribeTick(callback);
 
-        timeline.unsubscribeTick(handler);
+        dispose();
         timeline.tick(duration);
 
         expect(elapsed).equal(0);
