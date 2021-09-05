@@ -22,6 +22,10 @@ export interface NetworkPacketEvent {
 }
 
 export class Network {
+    public get nodes(): readonly INode[] {
+        return Array.from(this._nodes.values());
+    }
+
     private _packetCounter = 0;
     private _inflightPackets = new Map<number, Packet<unknown>>();
     private _nodes = new Map<string, INode>();

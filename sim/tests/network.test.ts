@@ -246,4 +246,17 @@ describe('network', () => {
         expect(packetCallback.calledWith({ type: 'sent', packet: packet })).true;
         expect(packetCallback.calledWith({ type: 'received', packet: packet })).true;
     });
+
+    it('nodes returned', () => {
+        const timeline = new Timeline();
+        const node = sinon.createStubInstance(Node);
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline as unknown as Timeline,
+            history as unknown as NetworkHistory);
+
+        network.registerNode(node);
+
+        expect(network.nodes).deep.equals([node]);
+    });
 });

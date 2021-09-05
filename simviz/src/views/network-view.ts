@@ -26,7 +26,7 @@ export class NetworkView {
         private _netowork: Network,
         options: Partial<NetworkViewOptions> = {}
     ) {
-        this._nodeSubscription = _netowork.subscribeNodes(this.onNode);
+        this._nodeSubscription = _netowork.subscribeNodes(event => this.onNode(event));
         this._options = { ...defaultOptions, ...options };
     }
 
