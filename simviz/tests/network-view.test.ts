@@ -1,5 +1,5 @@
-import { NetworkView } from './../src/views/network-view';
-import { INode, Network, NetworkNodeCallback, Node } from 'sim';
+import { NetworkView, NetworkViewOptions } from './../src/views/network-view';
+import { Network, NetworkNodeCallback, Node } from 'sim';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
@@ -39,5 +39,16 @@ describe('network view', () => {
 
         expect(Math.round(nodeViews[3].x)).equals(0);
         expect(Math.round(nodeViews[3].y)).equals(radius);
+    });
+
+    it('options default returned', () => {
+        const network = sinon.createStubInstance(Network);
+        const networkView = new NetworkView(network as unknown as Network);
+
+        const options = networkView.options;
+
+        expect(options).deep.equals(<NetworkViewOptions>{
+            nodeArrageRadius: 400
+        });
     });
 });

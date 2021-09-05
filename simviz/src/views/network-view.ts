@@ -2,7 +2,7 @@ import { NodeView } from './node-view';
 import { INode, Network, NetworkNodeEvent } from 'sim';
 
 export interface NetworkViewOptions {
-    nodeArrageRadius: number
+    readonly nodeArrageRadius: number
 }
 
 const defaultOptions: NetworkViewOptions = {
@@ -12,6 +12,10 @@ const defaultOptions: NetworkViewOptions = {
 export class NetworkView {
     public get nodes(): readonly NodeView[] {
         return this._nodes;
+    }
+
+    public get options(): NetworkViewOptions {
+        return this._options;
     }
 
     private _nodes: NodeView[] = [];
@@ -60,7 +64,7 @@ export class NetworkView {
         this._nodes.forEach((node, i) => {
             const x = Math.cos(Math.PI - i * 2 * Math.PI / this._nodes.length) * radius;
             const y = -Math.sin(Math.PI - i * 2 * Math.PI / this._nodes.length) * radius;
-            node.move(x, y);
+            node.move({x, y});
         });
     }
 }

@@ -1,15 +1,19 @@
+import { Point } from './../common/primitives';
 import { INode } from 'sim';
 
 export class NodeView {
-    private _x = 0;
-    private _y = 0;
+    private _origin: Point = { x: 0, y: 0 };
 
     public get x(): number {
-        return this._x;
+        return this._origin.x;
     }
 
     public get y(): number {
-        return this._y;
+        return this._origin.y;
+    }
+
+    public get origin(): Point {
+        return this._origin;
     }
 
     public get id(): string {
@@ -19,8 +23,7 @@ export class NodeView {
     constructor(private _node: INode) {
     }
 
-    move(x: number, y: number): void {
-        this._x = x;
-        this._y = y;
+    move(origin: Point): void {
+        this._origin = origin;
     }
 }
