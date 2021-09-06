@@ -20,6 +20,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
+    "@types/node": "^16.7.10",
     "@types/sinon": "^10.0.2",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
@@ -27,13 +28,12 @@
     "eslint": "^7.32.0",
     "mocha": "^9.1.1",
     "nyc": "^15.1.0",
+    "sim": "file:./../sim",
     "sinon": "^11.1.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   },
-  "dependencies": {
-  },
   "peerDependencies": {
-    "sim": "file:../sim"
+    "sim": "^1.0.0"
   }
 }

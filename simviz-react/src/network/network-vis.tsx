@@ -1,5 +1,6 @@
 import { FunctionComponent, useEffect, useState } from 'react';
-import { NetworkView, NodeView } from '../../node_modules/simviz/dist/src/index';
+import { NetworkView, NodeView } from 'simviz';
+import { NodeVis } from '../node/node-vis';
 
 export interface NetworkVisProps {
     readonly networkView: NetworkView;
@@ -22,7 +23,10 @@ export const NetworkVis: FunctionComponent<NetworkVisProps> = ({ networkView }) 
 
     return (
         <div>
-            {nodesState.nodes.map(node => <div key={node.id}>{node.id} x:{node.x} y:{node.y}</div>)}
+            {
+                nodesState.nodes.map(node =>
+                    <NodeVis key={node.id} nodeView={node}>{node.id} x:{node.x} y:{node.y}</NodeVis>)
+            }
         </div>
     );
 };
