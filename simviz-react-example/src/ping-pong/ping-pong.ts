@@ -1,5 +1,5 @@
-import { Network, NetworkHistory, Timeline, Node } from 'sim';
-import { NetworkView } from 'simviz';
+import { Network, NetworkHistory, Timeline, Node } from '@gobixm/sim';
+import { NetworkView, NetworkViewOptions } from '@gobixm/simviz';
 
 interface NodeState {
     counter: number;
@@ -27,7 +27,7 @@ function addNode(id: string, network: Network): Node<NodeState> {
     return node;
 }
 
-export function createNetwork(): {
+export function createNetwork(networkViewOptions: NetworkViewOptions): {
     timeline: Timeline;
     history: NetworkHistory;
     network: Network;
@@ -36,7 +36,7 @@ export function createNetwork(): {
     const timeline = new Timeline();
     const history = new NetworkHistory();
     const network = new Network(timeline, history);
-    const networkView = new NetworkView(network);
+    const networkView = new NetworkView(network, networkViewOptions);
 
     addNode('alice', network);
     addNode('bob', network);

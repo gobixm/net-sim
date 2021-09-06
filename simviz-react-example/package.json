@@ -6,9 +6,9 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
-    "sim": "file:../sim",
-    "simviz": "file:../simviz",
-    "simviz-react": "file:../simviz-react"
+    "@gobixm/sim": "file:./../sim",
+    "@gobixm/simviz": "file:./../simviz",
+    "@gobixm/simviz-react": "file:./../simviz-react"
   },
   "devDependencies": {
     "@types/node": "^12.0.0",

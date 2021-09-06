@@ -1,5 +1,5 @@
 {
-  "name": "sim",
+  "name": "@gobixm/sim",
   "version": "1.0.0",
   "description": "",
   "main": "dist/src/index.js",

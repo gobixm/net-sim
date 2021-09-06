@@ -1,6 +1,6 @@
 import { Point } from './../common/primitives';
 import { NodeView } from './node-view';
-import { Packet, Time } from 'sim';
+import { Packet, Time } from '@gobixm/sim';
 
 export class PacketView {
     public get from(): Point {

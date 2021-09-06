@@ -1,5 +1,5 @@
 import { NodeView } from './node-view';
-import { INode, Network, NetworkNodeEvent } from 'sim';
+import { INode, Network, NetworkNodeEvent } from '@gobixm/sim';
 
 export interface NetworkViewOptions {
     readonly nodeArrageRadius: number

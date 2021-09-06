@@ -1,9 +1,11 @@
 import { FunctionComponent, useEffect } from 'react';
 import { createNetwork } from './ping-pong';
-import { NetworkVis } from 'simviz-react';
+import { NetworkVis } from '@gobixm/simviz-react';
 
 export const PingPongVis: FunctionComponent = () => {
-    const network = createNetwork();
+    const network = createNetwork({
+        nodeArrageRadius: 200
+    });
 
     useEffect(() => {
         network.network.start();
@@ -14,6 +16,6 @@ export const PingPongVis: FunctionComponent = () => {
     });
 
     return (
-        <NetworkVis networkView={network.networkView}></NetworkVis>
+        <NetworkVis networkView={network.networkView} height={600} width={600}></NetworkVis>
     );
 };

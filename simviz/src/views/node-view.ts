@@ -1,5 +1,5 @@
 import { Point } from './../common/primitives';
-import { INode } from 'sim';
+import { INode } from '@gobixm/sim';
 
 export class NodeView {
     private _origin: Point = { x: 0, y: 0 };
