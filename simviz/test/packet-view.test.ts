@@ -1,6 +1,6 @@
 import { PacketView } from './../src/views/packet-view';
 import { NodeView } from './../src/views/node-view';
-import { Packet, Time } from 'sim';
+import { Packet, Time } from '@gobixm/sim';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { Point } from '../src/common/primitives';

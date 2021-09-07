@@ -1,5 +1,5 @@
 import { NodeView } from './../src/views/node-view';
-import { INode } from 'sim';
+import { INode } from '@gobixm/sim';
 import { expect } from 'chai';
 
 describe('packet view', () => {

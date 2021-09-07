@@ -4,3 +4,4 @@ coverage
 dist
 .vscode
 /example/build
+yarn-error.log

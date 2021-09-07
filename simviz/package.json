@@ -10,8 +10,8 @@
   "scripts": {
     "start": "npx ts-node src/index.ts",
     "build": "npx tsc",
-    "test": "mocha -r ts-node/register tests/**/*.test.ts",
-    "coverage": "nyc -r lcov -e .ts -x \"**/*.test.ts\" npm run test",
+    "test": "mocha -r ts-node/register test/**/*.test.ts",
+    "coverage": "nyc -r lcov -e .ts -x **/*.test.ts npm run test",
     "lint": "eslint . --fix --ext .ts"
   },
   "keywords": [],

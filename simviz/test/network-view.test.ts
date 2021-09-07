@@ -1,5 +1,5 @@
 import { NetworkView, NetworkViewOptions } from './../src/views/network-view';
-import { Network, NetworkNodeCallback, Node } from 'sim';
+import { Network, NetworkNodeCallback, Node } from '@gobixm/sim';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
