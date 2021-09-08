@@ -1,9 +1,15 @@
 import { Point } from './../common/primitives';
 import { INode } from '@gobixm/sim';
 
-export class NodeView {
-    private _origin: Point = { x: 0, y: 0 };
+export interface NodeViewOptions {
+    radius: number;
+}
 
+const defaultOptions: NodeViewOptions = {
+    radius: 40
+};
+
+export class NodeView {
     public get x(): number {
         return this._origin.x;
     }
@@ -20,7 +26,15 @@ export class NodeView {
         return this._node.id;
     }
 
-    constructor(private _node: INode) {
+    public get options(): NodeViewOptions {
+        return this._options;
+    }
+
+    private _origin: Point = { x: 0, y: 0 };
+    private _options: NodeViewOptions;
+
+    constructor(private _node: INode, options: Partial<NodeViewOptions> = {}) {
+        this._options = { ...defaultOptions, ...options };
     }
 
     move(origin: Point): void {

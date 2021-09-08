@@ -15,11 +15,12 @@ interface PongBody {
 
 function addNode(id: string, network: Network): Node<NodeState> {
     const node = new Node<NodeState>(id, network, { counter: 0 });
-    node.registerHandler<PongBody>('pong', (packet, state) => {
+    node.registerHandler<PongBody>('ping', (packet, state) => {
         state.counter = packet.body.counter + 1;
 
         const otherNodes = network.nodes.filter(n => n.id !== node.id);
         const receiver = otherNodes[Math.floor(Math.random() * otherNodes.length)];
+        node.send('pong', { counter: state.counter } as PongBody, packet.metadata.sender);
         node.send('ping', { counter: state.counter } as PingBody, receiver);
         return state;
     });
@@ -38,9 +39,11 @@ export function createNetwork(networkViewOptions: NetworkViewOptions): {
     const network = new Network(timeline, history);
     const networkView = new NetworkView(network, networkViewOptions);
 
-    addNode('alice', network);
-    addNode('bob', network);
+    const alice = addNode('alice', network);
+    const bob = addNode('bob', network);
     addNode('eve', network);
+
+    alice.send<PingBody>('ping', { counter: 0 }, bob);
 
     return {
         timeline,

@@ -1,5 +1,6 @@
 import { Network } from './network';
 import { Packet } from './packet';
+import { Time } from './time';
 export interface INode {
     id: string;
     processPacket: (packet: Packet<unknown>) => void;
@@ -27,8 +28,8 @@ export class Node<TState> implements INode {
 
     }
 
-    send<TPacket>(type: string, body: TPacket, receiver: INode): Packet<TPacket> {
-        return this._network.sendPacket(type, body, this, receiver);
+    send<TPacket>(type: string, body: TPacket, receiver: INode, latency: Time | undefined = undefined): Packet<TPacket> {
+        return this._network.sendPacket(type, body, this, receiver, latency);
     }
 
     processPacket(packet: Packet<unknown>): void {

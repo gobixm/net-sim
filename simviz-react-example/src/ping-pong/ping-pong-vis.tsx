@@ -10,12 +10,15 @@ export const PingPongVis: FunctionComponent = () => {
     useEffect(() => {
         network.network.start();
 
+        const interval = setInterval(() => network.timeline.tick(5), 10);
+
         return () => {
             network.network.stop();
+            clearInterval(interval);
         };
     });
 
     return (
-        <NetworkVis networkView={network.networkView} height={600} width={600}></NetworkVis>
+        <NetworkVis timeline={network.timeline} networkView={network.networkView} height={600} width={600}></NetworkVis>
     );
 };

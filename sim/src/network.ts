@@ -66,10 +66,10 @@ export class Network {
         this.notifyNode('unreg', node);
     }
 
-    sendPacket<T>(type: string, body: T, sender: INode, receiver: INode): Packet<T> {
+    sendPacket<T>(type: string, body: T, sender: INode, receiver: INode, latency: Time | undefined = undefined): Packet<T> {
         const meta: PacketMetadata = {
             id: this._packetCounter++,
-            latency: this.getLatency(),
+            latency: latency === undefined ? this.getLatency() : latency,
             receiver: receiver,
             sender: sender,
             sentAt: this._timeline.time

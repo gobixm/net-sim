@@ -1,30 +1,18 @@
+import { NodeView, NodeViewOptions } from './../src/views/node-view';
 import { NetworkView, NetworkViewOptions } from './../src/views/network-view';
-import { Network, NetworkNodeCallback, Node } from '@gobixm/sim';
+import { Network, NetworkHistory, Node, Timeline } from '@gobixm/sim';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
 describe('network view', () => {
     it('arranges on new node', () => {
-        let nodesCallback: NetworkNodeCallback = () => {
-            //
-        };
-        const network = sinon.createStubInstance(Network);
-        const nodes = Array(5).fill(0).map((_, i) => {
-            const node = sinon.createStubInstance(Node);
-            sinon.replaceGetter(node, 'id', () => i.toString());
-            return node;
-        });
-        network.subscribeNodes.callsFake((callback) => {
-            nodesCallback = callback;
-            return () => {
-                //
-            };
-        });
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        const nodes = Array(5).fill(0).map((_, i) => new Node<string>(i.toString(), network, 'state'));
         const radius = 333;
-        const networkView = new NetworkView(network as unknown as Network, { nodeArrageRadius: radius });
-
-        nodes.forEach(n => nodesCallback.apply(networkView, [{ type: 'reg', node: n }]));
-        nodesCallback.apply(networkView, [{ type: 'unreg', node: nodes[4] }]);
+        const networkView = new NetworkView(network, { nodeArrageRadius: radius });
+        nodes.forEach(n => network.registerNode(n));
+        network.unregisterNode(nodes[4].id);
 
         networkView.destroy();
         const nodeViews = networkView.nodes;
@@ -49,6 +37,69 @@ describe('network view', () => {
 
         expect(options).deep.equals(<NetworkViewOptions>{
             nodeArrageRadius: 400
+        });
+    });
+
+    it('packets added', () => {
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        network.start();
+        const networkView = new NetworkView(network);
+        const node1 = new Node<string>('1', network, 'state');
+        const node2 = new Node<string>('2', network, 'state');
+        network.registerNode(node1);
+        network.registerNode(node2);
+
+        const packet = node1.send<string>('foo', 'body', node2, 0);
+
+        network.stop();
+        networkView.destroy();
+        expect(networkView.packets.length).equal(1);
+        expect(networkView.packets[0].id).equal(packet.metadata.id);
+    });
+
+    it('packets removed', () => {
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        network.start();
+        const networkView = new NetworkView(network);
+        const node1 = new Node<string>('1', network, 'state');
+        const node2 = new Node<string>('2', network, 'state');
+        network.registerNode(node1);
+        network.registerNode(node2);
+
+        node1.send<string>('foo', 'body', node2, 0);
+        timeline.tick(1);
+
+        network.stop();
+        networkView.destroy();
+        expect(networkView.packets.length).equal(0);
+    });
+
+    it('packet with missing sender or receiver not added', () => {
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        network.start();
+        const networkView = new NetworkView(network);
+        const node1 = new Node<string>('1', network, 'state');
+        const node2 = new Node<string>('2', network, 'state');
+
+        node1.send<string>('foo', 'body', node1, 0);
+        node1.send<string>('foo', 'body', node2, 0);
+
+        network.stop();
+        networkView.destroy();
+        expect(networkView.packets).empty;
+    });
+
+    it('default options', () => {
+        const node1 = new Node<string>('1', undefined as unknown as Network, 'state');
+
+        const nodeView = new NodeView(node1);
+
+
+        expect(nodeView.options).deep.equal(<NodeViewOptions>{
+            radius: 40
         });
     });
 });
