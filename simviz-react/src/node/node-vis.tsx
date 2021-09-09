@@ -13,5 +13,3 @@ export const NodeVis: FunctionComponent<NodeVisProps> = ({ nodeView }) => {
         </g>
     );
 };
-
-

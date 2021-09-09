@@ -11,10 +11,6 @@ export interface NetworkVisProps {
     readonly timeline: Timeline;
 }
 
-interface NodesState {
-    nodes: readonly NodeView[];
-}
-
 export const NetworkVis: FunctionComponent<NetworkVisProps> = ({ timeline, networkView, height, width }) => {
     const [nodesState, setNodesState] = useState<readonly NodeView[]>(networkView.nodes);
     const [packetsState, setPacketsState] = useState<readonly PacketView[]>(networkView.packets);

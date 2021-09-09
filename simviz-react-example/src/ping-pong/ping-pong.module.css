@@ -1,0 +1,14 @@
+.container {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.network {
+    display: flex;
+}
+
+.history {
+    display: flex;
+    overflow-y: auto;
+    max-height: 600px;
+}

@@ -1,6 +1,7 @@
 import { FunctionComponent, useEffect } from 'react';
 import { createNetwork } from './ping-pong';
-import { NetworkVis } from '@gobixm/simviz-react';
+import { HistoryVis, NetworkVis } from '@gobixm/simviz-react';
+import styles from './ping-pong.module.css';
 
 export const PingPongVis: FunctionComponent = () => {
     const network = createNetwork({
@@ -19,6 +20,13 @@ export const PingPongVis: FunctionComponent = () => {
     });
 
     return (
-        <NetworkVis timeline={network.timeline} networkView={network.networkView} height={600} width={600}></NetworkVis>
+        <div className={styles.container}>
+            <div className={styles.network}>
+                <NetworkVis timeline={network.timeline} networkView={network.networkView} height={600} width={600}></NetworkVis>
+            </div>
+            <div className={styles.history}>
+                <HistoryVis history={network.historyView} network={network.network} />
+            </div>
+        </div>
     );
 };

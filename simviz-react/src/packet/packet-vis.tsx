@@ -8,8 +8,9 @@ interface PacketVisProps {
 export const PacketVis: FunctionComponent<PacketVisProps> = ({ packetView }) => {
     return (
         <g>
-            <circle fill="blue" r="10" cx={packetView.origin.x} cy={packetView.origin.y} />
             <line x1={packetView.from.x} y1={packetView.from.y} x2={packetView.to.x} y2={packetView.to.y} stroke="black" />
+            <circle fill="blue" r="10" cx={packetView.origin.x} cy={packetView.origin.y} />
+            <text fill="blue" dominantBaseline="central" textAnchor="middle" x={packetView.origin.x} y={packetView.origin.y} />
         </g>
     );
 };
