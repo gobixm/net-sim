@@ -3,10 +3,12 @@ import { INode } from '@gobixm/sim';
 
 export interface NodeViewOptions {
     radius: number;
+    color: string;
 }
 
 const defaultOptions: NodeViewOptions = {
-    radius: 40
+    radius: 40,
+    color: '#eeeeee'
 };
 
 export class NodeView {

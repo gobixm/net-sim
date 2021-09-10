@@ -3,11 +3,18 @@ import { NodeView } from './node-view';
 import { INode, Network, NetworkNodeEvent, NetworkPacketEvent, Packet } from '@gobixm/sim';
 
 export interface NetworkViewOptions {
-    readonly nodeArrageRadius: number
+    readonly nodeArrageRadius: number,
+    readonly nodeColorGenerator: (i: number, node: INode, network: Network) => string;
 }
 
+export const goldenAngleColorGenerator = (i: number): string => {
+    const hue = i * 137.508;
+    return `hsl(${hue},50%,75%)`;
+};
+
 const defaultOptions: NetworkViewOptions = {
-    nodeArrageRadius: 400
+    nodeArrageRadius: 400,
+    nodeColorGenerator: goldenAngleColorGenerator
 };
 
 export class NetworkView {
@@ -28,12 +35,13 @@ export class NetworkView {
     private _nodeSubscription: () => void;
     private _packetSubscription: () => void;
     private _options: NetworkViewOptions;
+    private _nodeCounter = 0;
 
     constructor(
         private _netowork: Network,
         options: Partial<NetworkViewOptions> = {}
     ) {
-        // todo: create initial node views
+        _netowork.nodes.forEach(node => this.addNode(node));
         this._nodeSubscription = _netowork.subscribeNodes(event => this.onNode(event));
         this._packetSubscription = _netowork.subscribePackets(event => this.onPacket(event));
         this._options = { ...defaultOptions, ...options };
@@ -57,12 +65,15 @@ export class NetworkView {
     }
 
     private createNodeView(node: INode): NodeView {
-        return new NodeView(node);
+        return new NodeView(node, {
+            color: this._options.nodeColorGenerator(this._nodeCounter, node, this._netowork)
+        });
     }
 
     private addNode(node: INode) {
         this._nodes = [...this._nodes, this.createNodeView(node)];
         this.arrangeNodes(this._options.nodeArrageRadius);
+        this._nodeCounter++;
     }
 
     private removeNode(node: INode) {

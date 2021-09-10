@@ -2,10 +2,12 @@ import { FunctionComponent, useEffect } from 'react';
 import { createNetwork } from './ping-pong';
 import { HistoryVis, NetworkVis } from '@gobixm/simviz-react';
 import styles from './ping-pong.module.css';
+import { goldenAngleColorGenerator } from '@gobixm/simviz';
 
 export const PingPongVis: FunctionComponent = () => {
     const network = createNetwork({
-        nodeArrageRadius: 200
+        nodeArrageRadius: 200,
+        nodeColorGenerator: goldenAngleColorGenerator
     });
 
     useEffect(() => {

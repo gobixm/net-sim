@@ -8,7 +8,7 @@ interface NodeVisProps {
 export const NodeVis: FunctionComponent<NodeVisProps> = ({ nodeView }) => {
     return (
         <g transform={`translate(${nodeView.x}, ${nodeView.y})`}>
-            <circle fill="grey" r={nodeView.options.radius} />
+            <circle fill={nodeView.options.color} r={nodeView.options.radius} />
             <text dominantBaseline="central" textAnchor="middle">{nodeView.id}</text>
         </g>
     );
