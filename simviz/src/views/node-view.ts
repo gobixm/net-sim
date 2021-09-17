@@ -32,6 +32,10 @@ export class NodeView {
         return this._options;
     }
 
+    public get state(): unknown {
+        return this._node.state;
+    }
+
     private _origin: Point = { x: 0, y: 0 };
     private _options: NodeViewOptions;
 

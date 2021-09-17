@@ -12,8 +12,7 @@
     "build": "npx tsc",
     "test": "mocha -r ts-node/register test/**/*.test.ts",
     "coverage": "nyc -r lcov -e .ts -x test/**/*.test.ts npm run test",
-    "lint": "eslint . --fix --ext .ts,tsx",
-    "example": "(cd example && npm start example)"
+    "lint": "eslint . --fix --ext .ts,tsx"
   },
   "keywords": [],
   "author": "Kirill Ivanov",
@@ -43,6 +42,5 @@
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
