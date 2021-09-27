@@ -14,8 +14,8 @@ export const NodeVis: FunctionComponent<NodeVisProps> = ({ nodeView }) => {
     };
 
     return (
-        <g transform={`translate(${nodeView.x}, ${nodeView.y})`}>
-            <circle fill={nodeView.options.color} r={nodeView.options.radius} onClick={toggleState} />
+        <g transform={`translate(${nodeView.x}, ${nodeView.y})`} onClick={toggleState}>
+            <circle fill={nodeView.options.color} r={nodeView.options.radius}/>
             <text dominantBaseline="central" textAnchor="middle">{nodeView.id}</text>
             <g transform={`translate(-${nodeView.options.radius}, 20)`}>
                 {stateVisible && <NodeStateVis nodeView={nodeView} />}
