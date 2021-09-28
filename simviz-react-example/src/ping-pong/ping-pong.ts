@@ -9,18 +9,15 @@ interface PingBody {
     counter: number;
 }
 
-interface PongBody {
-    counter: number;
-}
 
 function addNode(id: string, network: Network): Node<NodeState> {
     const node = new Node<NodeState>(id, network, { counter: 0 });
-    node.registerHandler<PongBody>('ping', (packet, state) => {
+    node.registerHandler<PingBody>('ping', (packet, state) => {
         state.counter = packet.body.counter + 1;
 
         const otherNodes = network.nodes.filter(n => n.id !== node.id);
         const receiver = otherNodes[Math.floor(Math.random() * otherNodes.length)];
-        node.send('pong', { counter: state.counter } as PongBody, packet.metadata.sender);
+        node.send('pong', { }, packet.metadata.sender);
         setTimeout(() => node.send('ping', { counter: state.counter } as PingBody, receiver), 500);
         return state;
     });

@@ -1,15 +1,15 @@
 import { Point } from './../common/primitives';
 import { NodeView } from './node-view';
-import { Packet, Time } from '@gobixm/sim';
+import { Packet, PacketMetadata, Time } from '@gobixm/sim';
 import { segmentCircleIntersection } from '../common/math-utils';
 
 export class PacketView {
     public get from(): Point {
-        return this._sender.origin;
+        return this._from;
     }
 
     public get to(): Point {
-        return this._receiver.origin;
+        return this._to;
     }
 
     public get origin(): Point {
@@ -20,7 +20,21 @@ export class PacketView {
         return this._packet.metadata.id;
     }
 
+    public get body(): unknown {
+        return this._packet.body;
+    }
+
+    public get metadata(): PacketMetadata {
+        return this._packet.metadata;
+    }
+
+    public get type(): string {
+        return this._packet.type;
+    }
+
     private _origin: Point;
+    private _from: Point;
+    private _to: Point;
 
     constructor(
         private _packet: Packet<unknown>,
@@ -28,26 +42,27 @@ export class PacketView {
         private _receiver: NodeView
     ) {
         this._origin = _sender.origin;
+        this._from = _sender.origin;
+        this._to = _receiver.origin;
     }
 
-    public updateOrigin(time: Time): void {
-        this._origin = this.calcOrigin(time);
-    }
-
-    private calcOrigin(time: Time): Point {
+    public update(time: Time): void {
         const senderPoint = segmentCircleIntersection(this._sender.origin, this._sender.options.radius, this._sender.origin, this._receiver.origin) || this._sender.origin;
         const receiverPoint = segmentCircleIntersection(this._receiver.origin, this._receiver.options.radius, this._receiver.origin, this._sender.origin) || this._receiver.origin;
 
+        this._from = senderPoint;
+        this._to = receiverPoint;
 
         const elapsed = time - this._packet.metadata.sentAt;
         const remaining = this._packet.metadata.sentAt + this._packet.metadata.latency - time;
         if (remaining === 0) {
-            return receiverPoint;
+            this._origin = receiverPoint;
+            return;
         }
         const ratio = elapsed / remaining;
 
         const x = (senderPoint.x + receiverPoint.x * ratio) / (1 + ratio);
         const y = (senderPoint.y + receiverPoint.y * ratio) / (1 + ratio);
-        return { x, y };
+        this._origin = { x, y };
     }
 }

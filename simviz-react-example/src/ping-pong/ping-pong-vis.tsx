@@ -41,7 +41,8 @@ export const PingPongVis: FunctionComponent = () => {
 
     return (
         <Grid container flexDirection="column">
-            <Grid container>
+            <Grid container flexDirection="column">
+                <Typography>You can click on Node, and Packet to view State.</Typography>
                 <Typography>Delay: {tickDelay}</Typography>
                 <Slider min={1} max={1000} defaultValue={10} onChange={tickDelayChange} aria-label="Temperature" ></Slider>
                 <Typography>Step: {tickStep}</Typography>

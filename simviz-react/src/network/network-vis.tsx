@@ -18,7 +18,7 @@ export const NetworkVis: FunctionComponent<NetworkVisProps> = ({ timeline, netwo
     useEffect(() => {
         const tickSubscription = timeline.subscribeTick(time => {
             setNodesState([...networkView.nodes]);
-            networkView.packets.forEach(packetView => packetView.updateOrigin(time));
+            networkView.packets.forEach(packetView => packetView.update(time));
             setPacketsState([...networkView.packets]);
         });
         return () => {
