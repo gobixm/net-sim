@@ -1,7 +1,15 @@
 import { Point } from './primitives';
 
-function equalDoubles(n1: number, n2: number, precision: number) {
-    return (Math.abs(n1 - n2) <= precision);
+function equalDoubles(n1: number, n2: number, precision: number): boolean {
+    return Math.abs(n1 - n2) <= precision;
+}
+
+function compareDoubles(n1: number, n2: number, precision = 0.001): number {
+    if (equalDoubles(n1, n2, precision)) {
+        return 0;
+    }
+
+    return n1 - n2;
 }
 
 function lineCircleIntersection(
@@ -71,12 +79,13 @@ export function segmentCircleIntersection(
     const ymin = Math.min(from.y, to.y);
     const ymax = Math.max(from.y, to.y);
 
-    if (points[0].x >= xmin && points[0].x <= xmax && points[0].y >= ymin && points[0].y <= ymax) {
+    if (compareDoubles(points[0].x, xmin) >= 0 && compareDoubles(points[0].x, xmax) <= 0 && compareDoubles(points[0].y, ymin) >= 0 && compareDoubles(points[0].y, ymax) <= 0) {
         return points[0];
     }
 
-    if (points[1].x >= xmin && points[1].x <= xmax && points[1].y >= ymin && points[1].y <= ymax) {
+    if (compareDoubles(points[1].x, xmin) >= 0 && compareDoubles(points[1].x, xmax) <= 0 && compareDoubles(points[1].y, ymin) >= 0 && compareDoubles(points[1].y, ymax) <= 0) {
         return points[1];
     }
+
     return undefined;
 }
