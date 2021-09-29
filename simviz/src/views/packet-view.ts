@@ -3,6 +3,16 @@ import { NodeView } from './node-view';
 import { Packet, PacketMetadata, Time } from '@gobixm/sim';
 import { segmentCircleIntersection } from '../common/math-utils';
 
+export interface PacketViewOptions {
+    radius: number;
+    color: string;
+}
+
+const defaultOptions: PacketViewOptions = {
+    radius: 10,
+    color: '#0000ee'
+};
+
 export class PacketView {
     public get from(): Point {
         return this._from;
@@ -32,15 +42,23 @@ export class PacketView {
         return this._packet.type;
     }
 
+    public get options(): PacketViewOptions {
+        return this._options;
+    }
+
     private _origin: Point;
     private _from: Point;
     private _to: Point;
+    private _options: PacketViewOptions;
 
     constructor(
         private _packet: Packet<unknown>,
         private _sender: NodeView,
-        private _receiver: NodeView
+        private _receiver: NodeView,
+        options: Partial<PacketViewOptions> = {}
     ) {
+        this._options = { ...defaultOptions, ...options };
+
         this._origin = _sender.origin;
         this._from = _sender.origin;
         this._to = _receiver.origin;

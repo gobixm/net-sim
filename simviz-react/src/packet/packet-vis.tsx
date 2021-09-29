@@ -20,7 +20,6 @@ export const PacketVis: FunctionComponent<PacketVisProps> = ({ packetView }) => 
         return () => {
             clearTimeout(timeout);
         };
-
     }, []);
 
     const getTransition = () => {
@@ -41,7 +40,7 @@ export const PacketVis: FunctionComponent<PacketVisProps> = ({ packetView }) => 
             <g style={{ transition: getTransition() }}
                 transform={translate}
                 onClick={toggleState}>
-                <circle fill="blue" r="10" />
+                <circle fill={packetView.options.color} r={packetView.options.radius} />
                 {stateVisible && <PacketStateVis packetView={packetView} />}
             </g>
             <text fill="blue" dominantBaseline="central" textAnchor="middle" x={packetView.origin.x} y={packetView.origin.y} />

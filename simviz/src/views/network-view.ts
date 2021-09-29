@@ -1,10 +1,11 @@
-import { PacketView } from './packet-view';
+import { PacketView, PacketViewOptions } from './packet-view';
 import { NodeView } from './node-view';
 import { INode, Network, NetworkNodeEvent, NetworkPacketEvent, Packet } from '@gobixm/sim';
 
 export interface NetworkViewOptions {
     readonly nodeArrageRadius: number,
     readonly nodeColorGenerator: (i: number, node: INode, network: Network) => string;
+    readonly packetOptionsFactory: (i: number, packet: Packet<unknown>, network: Network) => Partial<PacketViewOptions>;
 }
 
 export const goldenAngleColorGenerator = (i: number): string => {
@@ -14,7 +15,8 @@ export const goldenAngleColorGenerator = (i: number): string => {
 
 const defaultOptions: NetworkViewOptions = {
     nodeArrageRadius: 400,
-    nodeColorGenerator: goldenAngleColorGenerator
+    nodeColorGenerator: goldenAngleColorGenerator,
+    packetOptionsFactory: () => ({})
 };
 
 export class NetworkView {
@@ -126,7 +128,7 @@ export class NetworkView {
         if (!sender || !receiver) {
             return undefined;
         }
-        return new PacketView(packet, sender, receiver);
+        return new PacketView(packet, sender, receiver, this._options.packetOptionsFactory(packet.metadata.id, packet, this._netowork));
     }
 
     private addPacket(packet: Packet<unknown>) {

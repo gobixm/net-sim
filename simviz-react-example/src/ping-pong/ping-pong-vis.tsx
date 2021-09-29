@@ -7,7 +7,11 @@ import { Grid, Slider, Typography } from '@mui/material';
 
 const network = createNetwork({
     nodeArrageRadius: 200,
-    nodeColorGenerator: goldenAngleColorGenerator
+    nodeColorGenerator: goldenAngleColorGenerator,
+    packetOptionsFactory: (_, packet) => ({
+        color: packet.type === 'ping' ? '#ff0000' : '880000',
+        radius: packet.type === 'ping' ? 10 : 5,
+    })
 });
 
 // todo: stop
@@ -15,7 +19,7 @@ network.network.start();
 
 export const PingPongVis: FunctionComponent = () => {
     const [tickDelay, setTickDelay] = useState(10);
-        
+
     let interval: ReturnType<typeof setTimeout>;
 
     useEffect(() => {
@@ -37,7 +41,7 @@ export const PingPongVis: FunctionComponent = () => {
             <Grid container flexDirection="column">
                 <Typography>You can click on Node, and Packet to view State.</Typography>
                 <Typography>Delay: {tickDelay}</Typography>
-                <Slider min={1} max={1000} defaultValue={10} onChange={tickDelayChange} aria-label="Temperature" ></Slider>                
+                <Slider min={1} max={1000} defaultValue={10} onChange={tickDelayChange} aria-label="Temperature" ></Slider>
             </Grid>
             <Grid container flexDirection="row">
                 <div className={styles.network}>
