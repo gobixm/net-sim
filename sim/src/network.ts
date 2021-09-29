@@ -21,6 +21,18 @@ export interface NetworkPacketEvent {
     packet: Packet<unknown>;
 }
 
+interface NetworkOptions {
+    latencyProvider: (network: Network) => Time;
+}
+
+export function constantLatencyProvider(latency: Time): (network: Network) => Time {
+    return () => latency;
+}
+
+const defaultOptions: NetworkOptions = {
+    latencyProvider: constantLatencyProvider(500)
+};
+
 export class Network {
     public get nodes(): readonly INode[] {
         return Array.from(this._nodes.values());
@@ -30,13 +42,16 @@ export class Network {
     private _inflightPackets = new Map<number, Packet<unknown>>();
     private _nodes = new Map<string, INode>();
     private _tickUnsubscribe: TickUnsubscribe | undefined = undefined;
+    private _options: NetworkOptions;
 
     private _nodesSubscriptions = new Set<(event: NetworkNodeEvent) => void>();
     private _packetsSubscriptions = new Set<(event: NetworkPacketEvent) => void>();
 
     constructor(
         private _timeline: Timeline,
-        private _history: NetworkHistory) {
+        private _history: NetworkHistory,
+        options: Partial<NetworkOptions> = {}) {
+        this._options = { ...defaultOptions, ...options };
     }
 
     start(): void {
@@ -72,7 +87,7 @@ export class Network {
             latency: latency === undefined ? this.getLatency() : latency,
             receiver: receiver,
             sender: sender,
-            sentAt: this._timeline.time
+            sentAt: this._timeline.logicTime
         };
 
         const packet = new Packet<T>(type, body, meta);
@@ -97,9 +112,7 @@ export class Network {
     }
 
     private getLatency(): Time {
-        const max = 500;
-        const min = 50;
-        return Math.floor(Math.random() * (max - min + 1) + min);
+        return this._options.latencyProvider(this);
     }
 
     private addInflight<T>(packet: Packet<T>) {

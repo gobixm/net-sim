@@ -37,6 +37,9 @@ export class NetworkView {
     private _options: NetworkViewOptions;
     private _nodeCounter = 0;
 
+    private _nodesSubscriptions = new Set<() => void>();
+    private _packetsSubscriptions = new Set<() => void>();
+
     constructor(
         private _netowork: Network,
         options: Partial<NetworkViewOptions> = {}
@@ -50,6 +53,16 @@ export class NetworkView {
     destroy(): void {
         this._nodeSubscription();
         this._packetSubscription();
+    }
+
+    subscribeNodes(callback: () => void): () => void {
+        this._nodesSubscriptions.add(callback);
+        return () => this._nodesSubscriptions.delete(callback);
+    }
+
+    subscribePackets(callback: () => void): () => void {
+        this._packetsSubscriptions.add(callback);
+        return () => this._packetsSubscriptions.delete(callback);
     }
 
     private onNode(event: NetworkNodeEvent) {
@@ -74,11 +87,13 @@ export class NetworkView {
         this._nodes = [...this._nodes, this.createNodeView(node)];
         this.arrangeNodes(this._options.nodeArrageRadius);
         this._nodeCounter++;
+        this._nodesSubscriptions?.forEach(callback => callback());
     }
 
     private removeNode(node: INode) {
         this._nodes = this._nodes.filter(n => n.id !== node.id);
         this.arrangeNodes(this._options.nodeArrageRadius);
+        this._nodesSubscriptions?.forEach(callback => callback());
     }
 
     private arrangeNodes(radius: number) {
@@ -121,9 +136,11 @@ export class NetworkView {
         }
 
         this._packets = [...this._packets, newPacketView];
+        this._packetsSubscriptions?.forEach(callback => callback());
     }
 
     private removePacket(packet: Packet<unknown>) {
         this._packets = this._packets.filter(p => p.id !== packet.metadata.id);
+        this._packetsSubscriptions?.forEach(callback => callback());
     }
 }

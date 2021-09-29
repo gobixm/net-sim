@@ -1,4 +1,4 @@
-import { Network, NetworkHistory, Timeline, Node } from '@gobixm/sim';
+import { Network, NetworkHistory, Timeline, Node, constantLatencyProvider } from '@gobixm/sim';
 import { HistoryView, NetworkView, NetworkViewOptions } from '@gobixm/simviz';
 
 interface NodeState {
@@ -34,7 +34,7 @@ export function createNetwork(networkViewOptions: NetworkViewOptions): {
 } {
     const timeline = new Timeline();
     const history = new NetworkHistory();
-    const network = new Network(timeline, history);
+    const network = new Network(timeline, history, {latencyProvider: constantLatencyProvider(1000)});
     const networkView = new NetworkView(network, networkViewOptions);
     const historyView = new HistoryView(network, history);
 

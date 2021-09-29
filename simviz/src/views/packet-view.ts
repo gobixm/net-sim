@@ -44,6 +44,8 @@ export class PacketView {
         this._origin = _sender.origin;
         this._from = _sender.origin;
         this._to = _receiver.origin;
+
+        this.update(_packet.metadata.sentAt);
     }
 
     public update(time: Time): void {

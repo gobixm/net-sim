@@ -3,7 +3,7 @@ import { createNetwork } from './ping-pong';
 import { HistoryVis, NetworkVis } from '@gobixm/simviz-react';
 import styles from './ping-pong.module.css';
 import { goldenAngleColorGenerator } from '@gobixm/simviz';
-import { Box, Container, Grid, Slider, Typography } from '@mui/material';
+import { Grid, Slider, Typography } from '@mui/material';
 
 const network = createNetwork({
     nodeArrageRadius: 200,
@@ -15,12 +15,11 @@ network.network.start();
 
 export const PingPongVis: FunctionComponent = () => {
     const [tickDelay, setTickDelay] = useState(10);
-    const [tickStep, setTickStep] = useState(10);
-
+        
     let interval: ReturnType<typeof setTimeout>;
 
     useEffect(() => {
-        interval = setInterval(() => network.timeline.tick(tickStep), tickDelay);
+        interval = setInterval(() => network.timeline.tick(), tickDelay);
 
         return () => {
             clearInterval(interval);
@@ -30,13 +29,7 @@ export const PingPongVis: FunctionComponent = () => {
     const tickDelayChange = (_: Event, value: number | number[]) => {
         setTickDelay(value as number);
         clearInterval(interval);
-        interval = setInterval(() => network.timeline.tick(tickStep), value as number);
-    };
-
-    const tickStepChange = (_: Event, value: number | number[]) => {
-        setTickStep(value as number);
-        clearInterval(interval);
-        interval = setInterval(() => network.timeline.tick(value as number), tickDelay);
+        interval = setInterval(() => network.timeline.tick(), value as number);
     };
 
     return (
@@ -44,9 +37,7 @@ export const PingPongVis: FunctionComponent = () => {
             <Grid container flexDirection="column">
                 <Typography>You can click on Node, and Packet to view State.</Typography>
                 <Typography>Delay: {tickDelay}</Typography>
-                <Slider min={1} max={1000} defaultValue={10} onChange={tickDelayChange} aria-label="Temperature" ></Slider>
-                <Typography>Step: {tickStep}</Typography>
-                <Slider min={1} max={1000} defaultValue={10} onChange={tickStepChange}></Slider>
+                <Slider min={1} max={1000} defaultValue={10} onChange={tickDelayChange} aria-label="Temperature" ></Slider>                
             </Grid>
             <Grid container flexDirection="row">
                 <div className={styles.network}>
@@ -55,9 +46,7 @@ export const PingPongVis: FunctionComponent = () => {
                 <div className={styles.history}>
                     <HistoryVis history={network.historyView} network={network.network} />
                 </div>
-
             </Grid>
-
         </Grid>
 
     );
