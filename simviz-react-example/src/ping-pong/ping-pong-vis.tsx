@@ -18,40 +18,43 @@ const network = createNetwork({
 network.network.start();
 
 export const PingPongVis: FunctionComponent = () => {
-    const [tickDelay, setTickDelay] = useState(10);
+    const [timescale, setTimescale] = useState(1);
+    const [time, setTime] = useState(network.timeline.logicTime);
 
     let interval: ReturnType<typeof setTimeout>;
 
     useEffect(() => {
-        interval = setInterval(() => network.timeline.tick(), tickDelay);
+        const tick = 100;
+        interval = setInterval(() => {
+
+            network.timeline.tick(tick / timescale);
+            setTime(network.timeline.logicTime);
+        }, tick);
 
         return () => {
             clearInterval(interval);
         };
     });
 
-    const tickDelayChange = (_: Event, value: number | number[]) => {
-        setTickDelay(value as number);
-        clearInterval(interval);
-        interval = setInterval(() => network.timeline.tick(), value as number);
+    const timescaleChange = (_: Event, value: number | number[]) => {
+        setTimescale(value as number);
     };
 
     return (
         <Grid container flexDirection="column">
             <Grid container flexDirection="column">
                 <Typography>You can click on Node, and Packet to view State.</Typography>
-                <Typography>Delay: {tickDelay}</Typography>
-                <Slider min={1} max={1000} defaultValue={10} onChange={tickDelayChange} aria-label="Temperature" ></Slider>
+                <Typography>Timescale: {timescale}</Typography>
+                <Slider min={0.01} max={10} step={0.01} defaultValue={1} onChange={timescaleChange}></Slider>
             </Grid>
             <Grid container flexDirection="row">
                 <div className={styles.network}>
-                    <NetworkVis timeline={network.timeline} networkView={network.networkView} height={600} width={600}></NetworkVis>
+                    <NetworkVis timeline={network.timeline} networkView={network.networkView} height={600} width={600} timescale={timescale} time={time}></NetworkVis>
                 </div>
                 <div className={styles.history}>
                     <HistoryVis history={network.historyView} network={network.network} />
                 </div>
             </Grid>
         </Grid>
-
     );
 };

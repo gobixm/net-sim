@@ -1,30 +1,40 @@
-import { FunctionComponent, useEffect, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { PacketView } from '@gobixm/simviz';
 import { PacketStateVis } from './packet-state-vis';
-import { Point } from '@gobixm/simviz';
+import { Time } from '@gobixm/sim';
 
 interface PacketVisProps {
     packetView: PacketView;
+    timescale: number;
+    time: Time;
 }
 
-const getTransform = (point: Point) => {
-    return `translate(${point.x}, ${point.y})`;
+const getTransition = (timescale: number, time: Time, packetView: PacketView) => {
+    const remaining = packetView.metadata.latency - time + packetView.metadata.sentAt;
+    return `transform ${remaining * timescale}ms linear`;
 };
 
-export const PacketVis: FunctionComponent<PacketVisProps> = ({ packetView }) => {
+export const PacketVis: FunctionComponent<PacketVisProps> = ({ packetView, timescale, time }) => {
     const [stateVisible, setStateVisible] = useState(false);
-    const [translate, setTranslate] = useState(getTransform(packetView.from));
+
+    const ref = useRef(null);
 
     useEffect(() => {
-        const timeout = setTimeout(() => setTranslate(getTransform(packetView.to)), 20); //todo: transform insant bug
-        return () => {
-            clearTimeout(timeout);
-        };
+        const element = (ref.current as unknown as HTMLElement);
+        element.style.setProperty('transform', `matrix(1, 0, 0, 1, ${packetView.from.x}, ${packetView.from.y})`);
     }, []);
 
-    const getTransition = () => {
-        return `transform ${packetView.metadata.latency}ms linear`;
-    };
+    useEffect(() => {
+        const element = (ref.current as unknown as HTMLElement);
+
+        element.style.setProperty('transform', window.getComputedStyle(ref.current as unknown as Element).getPropertyValue('transform'));
+
+        window.requestAnimationFrame(() => {
+            element.style.setProperty('transition', getTransition(timescale, time, packetView));
+            element.style.setProperty('transform', `matrix(1, 0, 0, 1, ${packetView.to.x}, ${packetView.to.y})`);
+        });
+    }, [timescale]);
+
 
     const toggleState = () => {
         setStateVisible(prev => !prev);
@@ -37,9 +47,7 @@ export const PacketVis: FunctionComponent<PacketVisProps> = ({ packetView }) => 
                 <polygon points="0 0, 10 3.5, 0 7" fill="red" />
             </marker>
             <line markerEnd="url(#arrowhead)" x1={packetView.from.x} y1={packetView.from.y} x2={packetView.to.x} y2={packetView.to.y} stroke="black" />
-            <g style={{ transition: getTransition() }}
-                transform={translate}
-                onClick={toggleState}>
+            <g ref={ref} onClick={toggleState}>
                 <circle fill={packetView.options.color} r={packetView.options.radius} />
                 {stateVisible && <PacketStateVis packetView={packetView} />}
             </g>

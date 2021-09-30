@@ -8,11 +8,11 @@ export class Timeline {
         return this._logicTime;
     }
 
-    private _logicTime: Time = new Date().getTime();
+    private _logicTime: Time = 0;
     private _subscribers = new Set<TickCallback>();
 
-    tick(): void {
-        this._logicTime = new Date().getTime();
+    tick(step: Time): void {
+        this._logicTime += step;
         this._subscribers.forEach(callback => callback(this._logicTime));
     }
 
