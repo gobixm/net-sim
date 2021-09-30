@@ -25,6 +25,11 @@ interface NetworkOptions {
     latencyProvider: (network: Network) => Time;
 }
 
+interface PendingPacket {
+    packet: Packet<unknown>;
+    senderState: unknown;
+}
+
 export function constantLatencyProvider(latency: Time): (network: Network) => Time {
     return () => latency;
 }
@@ -40,6 +45,7 @@ export class Network {
 
     private _packetCounter = 0;
     private _inflightPackets = new Map<number, Packet<unknown>>();
+    private _pendingPackets: PendingPacket[] = [];
     private _nodes = new Map<string, INode>();
     private _tickUnsubscribe: TickUnsubscribe | undefined = undefined;
     private _options: NetworkOptions;
@@ -81,16 +87,27 @@ export class Network {
         this.notifyNode('unreg', node);
     }
 
-    sendPacket<T>(type: string, body: T, sender: INode, receiver: INode, latency: Time | undefined = undefined): Packet<T> {
+    sendPacket<T>(type: string, body: T, sender: INode, receiver: INode, latency: Time | undefined = undefined, delay: Time | undefined = undefined): Packet<T> {
         const meta: PacketMetadata = {
             id: this._packetCounter++,
             latency: latency === undefined ? this.getLatency() : latency,
             receiver: receiver,
             sender: sender,
-            sentAt: this._timeline.logicTime
+            sentAt: this._timeline.logicTime + (delay ?? 0)
         };
 
         const packet = new Packet<T>(type, body, meta);
+
+        if (delay) {
+            this._pendingPackets = [
+                ...this._pendingPackets,
+                <PendingPacket>{
+                    packet: packet,
+                    senderState: deepClone(sender.state)
+                }].sort((a, b) => a.packet.metadata.sentAt - b.packet.metadata.sentAt);
+            return packet;
+        }
+
         this.addInflight(packet);
         this._history.add({
             type: 'send',
@@ -124,6 +141,20 @@ export class Network {
     }
 
     private onTick(time: Time) {
+        this._pendingPackets.forEach(pending => {
+            if (pending.packet.metadata.sentAt <= time) {
+                this.addInflight(pending.packet);
+                this._history.add({
+                    type: 'send',
+                    packet: pending.packet,
+                    nodeState: pending.senderState
+                });
+                this.notifyPacket('sent', pending.packet);
+            }
+        });
+
+        this._pendingPackets = this._pendingPackets.filter(x => x.packet.metadata.sentAt > time);
+
         this._inflightPackets.forEach((packet, id) => {
             if (packet.metadata.sentAt + packet.metadata.latency <= time) {
                 this.onPacketReceived(packet);

@@ -9,18 +9,20 @@ interface PingBody {
     counter: number;
 }
 
-
 function addNode(id: string, network: Network): Node<NodeState> {
     const node = new Node<NodeState>(id, network, { counter: 0 });
+
+    // node logic goes here
     node.registerHandler<PingBody>('ping', (packet, state) => {
         state.counter = packet.body.counter + 1;
 
         const otherNodes = network.nodes.filter(n => n.id !== node.id);
         const receiver = otherNodes[Math.floor(Math.random() * otherNodes.length)];
-        node.send('pong', { }, packet.metadata.sender);
-        setTimeout(() => node.send('ping', { counter: state.counter } as PingBody, receiver), 500);
+        node.send('pong', {}, packet.metadata.sender, undefined, 250);  // reply after 250 delay
+        node.send('ping', { counter: state.counter } as PingBody, receiver, undefined, 500);    //send ping to random node after 500 delay
         return state;
     });
+
     network.registerNode(node);
     return node;
 }
@@ -34,7 +36,7 @@ export function createNetwork(networkViewOptions: Partial<NetworkViewOptions>): 
 } {
     const timeline = new Timeline();
     const history = new NetworkHistory();
-    const network = new Network(timeline, history, {latencyProvider: constantLatencyProvider(1000)});
+    const network = new Network(timeline, history, { latencyProvider: constantLatencyProvider(1000) });
     const networkView = new NetworkView(network, networkViewOptions);
     const historyView = new HistoryView(network, history);
 

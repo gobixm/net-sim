@@ -28,8 +28,8 @@ export class Node<TState> implements INode {
 
     }
 
-    send<TPacket>(type: string, body: TPacket, receiver: INode, latency: Time | undefined = undefined): Packet<TPacket> {
-        return this._network.sendPacket(type, body, this, receiver, latency);
+    send<TPacket>(type: string, body: TPacket, receiver: INode, latency: Time | undefined = undefined, delay: Time | undefined = undefined): Packet<TPacket> {
+        return this._network.sendPacket(type, body, this, receiver, latency, delay);
     }
 
     processPacket(packet: Packet<unknown>): void {
