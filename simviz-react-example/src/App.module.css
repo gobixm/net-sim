@@ -1,0 +1,19 @@
+.main {
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 10px;
+}
+
+.navPane {
+    display: flex;
+    flex-flow: column;
+    flex: none;
+    padding: 10px;
+}
+
+.page {
+    display: flex;
+    flex-flow: row nowrap;
+    flex: 1 1 100%;
+    padding: 10px;
+}
