@@ -27,7 +27,7 @@ function addNode(id: string, network: Network): Node<NodeState> {
     return node;
 }
 
-export function createNetwork(networkViewOptions: Partial<NetworkViewOptions>): {
+export function createSimulation(networkViewOptions: Partial<NetworkViewOptions>): {
     timeline: Timeline;
     history: NetworkHistory;
     network: Network;

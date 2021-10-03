@@ -1,5 +1,5 @@
-import { FunctionComponent, useEffect, useState } from 'react';
-import { createNetwork } from './ping-pong';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { createSimulation } from './ping-pong';
 import { NetworkVis } from '@gobixm/simviz-react';
 import styles from './ping-pong.module.css';
 import { goldenAngleColorGenerator } from '@gobixm/simviz';
@@ -7,7 +7,7 @@ import { Grid, Typography } from '@mui/material';
 import { HistoryPanel } from '../common/history-panel/history-panel';
 import { TimePanel } from '../common/time-panel/time-panel';
 
-const network = createNetwork({
+const network = createSimulation({
     nodeArrageRadius: 200,
     nodeColorGenerator: goldenAngleColorGenerator,
     packetOptionsFactory: (_, packet) => ({
@@ -16,28 +16,19 @@ const network = createNetwork({
     })
 });
 
-// todo: stop
-network.network.start();
-
 export const PingPongVis: FunctionComponent = () => {
+    const sim = useRef(network);
     const [timescale, setTimescale] = useState(1);
-    const [time, setTime] = useState(network.timeline.logicTime);
-
-    let interval: ReturnType<typeof setTimeout>;
+    const [time, setTime] = useState(sim.current.timeline.logicTime);
 
     useEffect(() => {
-        const tick = 100;
-        interval = setInterval(() => {
-
-            network.timeline.tick(tick / timescale);
-            setTime(network.timeline.logicTime);
-        }, tick);
+        network.network.start();
 
         return () => {
-            clearInterval(interval);
+            network.network.stop();
         };
     });
-    
+
     const handleTimeScale = (value: number) => setTimescale(value);
     const handleTime = (value: number) => setTime(value);
 
@@ -45,14 +36,14 @@ export const PingPongVis: FunctionComponent = () => {
         <Grid container flexDirection="column">
             <Grid container flexDirection="column">
                 <Typography>You can click on Node, and Packet to view State.</Typography>
-                <TimePanel timeline={network.timeline} onTime={handleTime} onTimescale={handleTimeScale}></TimePanel>
+                <TimePanel timeline={sim.current.timeline} onTime={handleTime} onTimescale={handleTimeScale}></TimePanel>
             </Grid>
             <Grid container flexDirection="row">
                 <div className={styles.network}>
-                    <NetworkVis timeline={network.timeline} networkView={network.networkView} height={600} width={600} timescale={timescale} time={time}></NetworkVis>
+                    <NetworkVis timeline={sim.current.timeline} networkView={sim.current.networkView} height={600} width={600} timescale={timescale} time={time}></NetworkVis>
                 </div>
-                <HistoryPanel historyView={network.historyView} network={network.network} />
-            </Grid>            
+                <HistoryPanel historyView={sim.current.historyView} network={sim.current.network} />
+            </Grid>
         </Grid>
     );
 };
