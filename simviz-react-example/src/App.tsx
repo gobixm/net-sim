@@ -34,7 +34,7 @@ export const App: FunctionComponent = () => {
           </Button>
         </nav>
         <div className={styles.page}>
-          <Route path="/" exact component={PingPongVis} />
+          <Route path="/" exact component={RequestReply} />
           <Route path="/ping-pong" exact component={PingPongVis} />
           <Route path="/req-rep" exact component={RequestReply} />
         </div>

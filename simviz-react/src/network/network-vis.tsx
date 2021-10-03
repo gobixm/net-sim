@@ -18,7 +18,6 @@ export const NetworkVis: FunctionComponent<NetworkVisProps> = ({ timeline, netwo
     const [packetsState, setPacketsState] = useState<readonly PacketView[]>(networkView.packets);
     
     useEffect(() => {
-
         const nodesSubscription = networkView.subscribeNodes(() => setNodesState([...networkView.nodes]));
         const packetsSubscription = networkView.subscribePackets(() => {
             setPacketsState([...networkView.packets]);
@@ -33,13 +32,14 @@ export const NetworkVis: FunctionComponent<NetworkVisProps> = ({ timeline, netwo
     return (
         <svg height={height} width={width} viewBox={`${-height / 2} ${-width / 2} ${height} ${width}`}>
             {
-                packetsState.map(packet =>
-                    <PacketVis key={packet.id} packetView={packet} timescale={timescale} time={time} />)
-            }
-            {
                 nodesState.map(node =>
                     <NodeVis key={node.id} nodeView={node}>{node.id} x:{node.x} y:{node.y}</NodeVis>)
             }
+            {
+                packetsState.map(packet =>
+                    <PacketVis key={packet.id} packetView={packet} timescale={timescale} time={time} />)
+            }
+            
         </svg>
     );
 };

@@ -69,6 +69,7 @@ export class Network {
     stop(): void {
         if (this._tickUnsubscribe) {
             this._tickUnsubscribe();
+            this._tickUnsubscribe = undefined;
         }
     }
 

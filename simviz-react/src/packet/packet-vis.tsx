@@ -22,6 +22,9 @@ export const PacketVis: FunctionComponent<PacketVisProps> = ({ packetView, times
     useEffect(() => {
         const element = (ref.current as unknown as HTMLElement);
         element.style.setProperty('transform', `matrix(1, 0, 0, 1, ${packetView.from.x}, ${packetView.from.y})`);
+        if (packetView.options.showStateOnCreate) {
+            setStateVisible(true);
+        }
     }, []);
 
     useEffect(() => {

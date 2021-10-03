@@ -1,9 +1,11 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 import { createNetwork } from './ping-pong';
-import { HistoryVis, NetworkVis } from '@gobixm/simviz-react';
+import { NetworkVis } from '@gobixm/simviz-react';
 import styles from './ping-pong.module.css';
 import { goldenAngleColorGenerator } from '@gobixm/simviz';
-import { Grid, Slider, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
+import { HistoryPanel } from '../common/history-panel/history-panel';
+import { TimePanel } from '../common/time-panel/time-panel';
 
 const network = createNetwork({
     nodeArrageRadius: 200,
@@ -35,26 +37,22 @@ export const PingPongVis: FunctionComponent = () => {
             clearInterval(interval);
         };
     });
-
-    const timescaleChange = (_: Event, value: number | number[]) => {
-        setTimescale(value as number);
-    };
+    
+    const handleTimeScale = (value: number) => setTimescale(value);
+    const handleTime = (value: number) => setTime(value);
 
     return (
         <Grid container flexDirection="column">
             <Grid container flexDirection="column">
                 <Typography>You can click on Node, and Packet to view State.</Typography>
-                <Typography>Timescale: {timescale}</Typography>
-                <Slider min={0.01} max={10} step={0.01} defaultValue={1} onChange={timescaleChange}></Slider>
+                <TimePanel timeline={network.timeline} onTime={handleTime} onTimescale={handleTimeScale}></TimePanel>
             </Grid>
             <Grid container flexDirection="row">
                 <div className={styles.network}>
                     <NetworkVis timeline={network.timeline} networkView={network.networkView} height={600} width={600} timescale={timescale} time={time}></NetworkVis>
                 </div>
-                <div className={styles.history}>
-                    <HistoryVis history={network.historyView} network={network.network} />
-                </div>
-            </Grid>
+                <HistoryPanel historyView={network.historyView} network={network.network} />
+            </Grid>            
         </Grid>
     );
 };

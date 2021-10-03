@@ -6,11 +6,13 @@ import { segmentCircleIntersection } from '../common/math-utils';
 export interface PacketViewOptions {
     radius: number;
     color: string;
+    showStateOnCreate: boolean;
 }
 
 const defaultOptions: PacketViewOptions = {
     radius: 10,
-    color: '#0000ee'
+    color: '#0000ee',
+    showStateOnCreate: true
 };
 
 export class PacketView {

@@ -1,0 +1,9 @@
+.host {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.visualization {
+    display: flex;
+    flex-flow: row;
+}
