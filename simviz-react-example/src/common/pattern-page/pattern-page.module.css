@@ -6,4 +6,9 @@
 .visualization {
     display: flex;
     flex-flow: row;
+    margin-top: 20px;
+}
+
+.timeline {
+    margin-top: 20px;
 }
