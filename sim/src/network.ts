@@ -34,6 +34,10 @@ export function constantLatencyProvider(latency: Time): (network: Network) => Ti
     return () => latency;
 }
 
+export function randomLatencyProvider(min: Time, max: Time): (network: Network) => Time {
+    return () => Math.random() * (max - min) + min;
+}
+
 const defaultOptions: NetworkOptions = {
     latencyProvider: constantLatencyProvider(500)
 };
@@ -117,6 +121,12 @@ export class Network {
         });
         this.notifyPacket('sent', packet);
         return packet;
+    }
+
+    sendBroadcastPacket<T>(type: string, body: T, sender: INode, latency: Time | undefined = undefined, delay: Time | undefined = undefined): Packet<T>[] {
+        return Array.from(this._nodes.values())
+            .filter(node => node.id !== sender.id)
+            .map(node => this.sendPacket<T>(type, body, sender, node, latency, delay));
     }
 
     subscribeNodes(callback: NetworkNodeCallback): () => void {

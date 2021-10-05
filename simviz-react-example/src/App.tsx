@@ -6,6 +6,7 @@ import {
 import { PingPongVis } from './ping-pong/ping-pong-vis';
 import styles from './App.module.css';
 import { RequestReply } from './req-rep/req-rep';
+import { Survey } from './survey/survey';
 
 export const App: FunctionComponent = () => {
   return (
@@ -28,6 +29,11 @@ export const App: FunctionComponent = () => {
             </RouterLink>
           </Button>
           <Button>
+            <RouterLink to="/survey" style={{ textDecoration: 'none' }}>
+              Survey
+            </RouterLink>
+          </Button>
+          <Button>
             <RouterLink to="/ping-pong" style={{ textDecoration: 'none' }}>
               Ping Pong
             </RouterLink>
@@ -37,6 +43,7 @@ export const App: FunctionComponent = () => {
           <Route path="/" exact component={RequestReply} />
           <Route path="/ping-pong" exact component={PingPongVis} />
           <Route path="/req-rep" exact component={RequestReply} />
+          <Route path="/survey" exact component={Survey} />
         </div>
       </div>
     </BrowserRouter >
