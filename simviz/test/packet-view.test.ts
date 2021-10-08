@@ -30,7 +30,7 @@ describe('packet view', () => {
             receiver as unknown as NodeView,
         );
 
-        packetView.updateOrigin(timeBase + latency * 3 / 4);
+        packetView.update(timeBase + latency * 3 / 4);
 
         expect(packetView.origin.x).greaterThan(45).lessThan(46);
         expect(packetView.origin.y).greaterThan(22).lessThan(23);
@@ -60,7 +60,7 @@ describe('packet view', () => {
             receiver as unknown as NodeView,
         );
 
-        packetView.updateOrigin(timeBase + latency);
+        packetView.update(timeBase + latency);
 
         expect(packetView.origin).deep.equals(<Point>{ x: 90, y: 0 });
     });

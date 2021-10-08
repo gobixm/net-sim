@@ -2,14 +2,15 @@
   "name": "@gobixm/sim",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "module": "dist/esm/index.js",
+  "main": "dist/cjs/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "/dist"
+    "dist"
   ],
   "scripts": {
     "start": "npx ts-node src/index.ts",
-    "build": "npx tsc",
+    "build": "rollup -c",
     "test": "mocha -r ts-node/register test/**/*.test.ts",
     "coverage": "nyc -r lcov -e .ts -x test/*.test.ts npm run test",
     "lint": "eslint . --fix --ext .ts"
@@ -18,6 +19,9 @@
   "author": "Kirill Ivanov",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "@rollup/plugin-typescript": "^8.2.5",
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.7.10",
@@ -28,8 +32,14 @@
     "eslint": "^7.32.0",
     "mocha": "^9.1.1",
     "nyc": "^15.1.0",
+    "rollup": "^2.58.0",
+    "rollup-plugin-dts": "^4.0.0",
+    "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
     "sinon": "^11.1.2",
     "ts-node": "^10.2.1",
+    "tslib": "^2.3.1",
     "typescript": "^4.4.2"
   }
 }

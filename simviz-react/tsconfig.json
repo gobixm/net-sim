@@ -2,16 +2,17 @@
   "compilerOptions": {
     "target": "es6",
     "lib": [
-      "es6",
+      "esnext",
       "dom",
       "dom.iterable"
     ],
+    "module": "esnext",
     "jsx": "react-jsx",
-    "module": "commonjs",
     "rootDir": ".",
     "moduleResolution": "node",
     "declaration": true,
-    "declarationMap": true,
+    "declarationDir": "types",
+    "emitDeclarationOnly": true,
     "sourceMap": true,
     "outDir": "dist",
     "esModuleInterop": true,

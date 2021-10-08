@@ -1,8 +1,7 @@
 import { NodeView, NodeViewOptions } from './../src/views/node-view';
-import { NetworkView, NetworkViewOptions } from './../src/views/network-view';
+import { NetworkView } from './../src/views/network-view';
 import { Network, NetworkHistory, Node, Timeline } from '@gobixm/sim';
 import { expect } from 'chai';
-import * as sinon from 'sinon';
 
 describe('network view', () => {
     it('arranges on new node', () => {
@@ -30,14 +29,13 @@ describe('network view', () => {
     });
 
     it('options default returned', () => {
-        const network = sinon.createStubInstance(Network);
-        const networkView = new NetworkView(network as unknown as Network);
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        const networkView = new NetworkView(network);
 
         const options = networkView.options;
 
-        expect(options).deep.equals(<NetworkViewOptions>{
-            nodeArrageRadius: 400
-        });
+        expect(options.nodeArrageRadius).equals(400);
     });
 
     it('packets added', () => {
@@ -99,6 +97,7 @@ describe('network view', () => {
 
 
         expect(nodeView.options).deep.equal(<NodeViewOptions>{
+            color: '#eeeeee',
             radius: 40
         });
     });

@@ -8,7 +8,7 @@ describe('timeline', () => {
 
         timeline.tick(10);
 
-        const currentTime = timeline.time;
+        const currentTime = timeline.logicTime;
         expect(currentTime).equal(10);
     });
 
