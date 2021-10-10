@@ -59,6 +59,10 @@ export function segmentCircleIntersection(
     r: number,
     from: Point,
     to: Point): Point | undefined {
+    if (compareDoubles(from.x, to.x) === 0 && compareDoubles(from.y, to.y) === 0) {
+        return undefined;
+    }
+
     const d1 = Math.hypot(from.x - circle.x, from.y - circle.y);
     const d2 = Math.hypot(to.x - circle.x, to.y - circle.y);
     if (d1 > r && d2 > r) {
@@ -67,7 +71,6 @@ export function segmentCircleIntersection(
     if (d1 < r && d2 < r) {
         return undefined;
     }
-
 
     const points = lineCircleIntersection(circle, r, from, to);
     if (points.length < 1) {

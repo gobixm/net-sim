@@ -11,4 +11,12 @@ describe('packet view', () => {
 
         expect(nodeView.origin).deep.equals(expectedOrigin);
     });
+
+    it('state returned', () => {
+        const nodeView = new NodeView({ state: 'state' } as INode);
+
+        const state = nodeView.state;
+
+        expect(state).equals('state');
+    });
 });

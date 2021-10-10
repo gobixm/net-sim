@@ -1,6 +1,6 @@
 import { NetworkEvent } from './../src/history';
 import { Timeline } from './../src/timeline';
-import { Network, NetworkNodeCallback, NetworkPacketCallback } from './../src/network';
+import { Network, NetworkNodeCallback, NetworkPacketCallback, randomLatencyProvider } from './../src/network';
 import { Node } from './../src/node';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
@@ -258,5 +258,102 @@ describe('network', () => {
         network.registerNode(node);
 
         expect(network.nodes).deep.equals([node]);
+    });
+
+    it('broadcase packet sent', () => {
+        const timeline = new Timeline();
+        const sender = sinon.createStubInstance(Node);
+        const node1 = sinon.createStubInstance(Node);
+        sinon.replaceGetter(node1, 'id', () => '1');
+        const node2 = sinon.createStubInstance(Node);
+        sinon.replaceGetter(node2, 'id', () => '2');
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline,
+            history as unknown as NetworkHistory);
+        network.start();
+        network.registerNode(sender);
+        network.registerNode(node1);
+        network.registerNode(node2);
+
+        const packets = network.sendBroadcastPacket<string>('msg', 'body', sender as unknown as Node<string>);
+        timeline.tick(packets[0].metadata.latency);
+        timeline.tick(packets[1].metadata.latency);
+
+        expect(node1.processPacket.calledWith(packets[0])).true;
+        expect(node2.processPacket.calledWith(packets[1])).true;
+    });
+
+
+    it('pending packet sent', () => {
+        const timeline = new Timeline();
+        const sender = sinon.createStubInstance(Node);
+        sinon.replaceGetter(sender, 'id', () => 'sender');
+        const receiver = sinon.createStubInstance(Node);
+        sinon.replaceGetter(receiver, 'id', () => 'receiver');
+
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline,
+            history as unknown as NetworkHistory);
+        network.start();
+        network.registerNode(sender);
+        network.registerNode(receiver);
+
+        const packetCallback = sinon.fake(() => {
+            //do nothing
+        });
+        const dispose = network.subscribePackets(packetCallback as NetworkPacketCallback);
+
+        const delay = 100;
+        const latency = 100;
+        const packet = network.sendPacket<string>('msg', 'body', sender, receiver, latency, delay);
+        timeline.tick(10);
+        expect(packetCallback.notCalled).true;
+
+        timeline.tick(delay);
+        expect(packetCallback.called).true;
+
+        timeline.tick(latency);
+        expect(receiver.processPacket.calledWith(packet)).true;
+
+        dispose();
+    });
+
+    it('pending packet sent ordered', () => {
+        const timeline = new Timeline();
+        const sender = sinon.createStubInstance(Node);
+        sinon.replaceGetter(sender, 'id', () => 'sender');
+        const receiver = sinon.createStubInstance(Node);
+        sinon.replaceGetter(receiver, 'id', () => 'receiver');
+
+        const history = sinon.createStubInstance(NetworkHistory);
+        const network = new Network(
+            timeline,
+            history as unknown as NetworkHistory);
+        network.start();
+        network.registerNode(sender);
+        network.registerNode(receiver);
+
+        const delay1 = 100;
+        const delay2 = 200;
+        const latency = 100;
+        const packet2 = network.sendPacket<string>('msg', 'body', sender, receiver, latency, delay2);
+        const packet1 = network.sendPacket<string>('msg', 'body', sender, receiver, latency, delay1);
+        timeline.tick(delay2 + latency + 1);
+
+        expect(receiver.processPacket.getCall(0).calledWith(packet1)).true;
+        expect(receiver.processPacket.getCall(1).calledWith(packet2)).true;
+    });
+
+    it('randomLatencyProvider returns latency', () => {
+        const network = sinon.createStubInstance(Network);
+
+        const provider = randomLatencyProvider(0, 100);
+
+        const latency = provider(network as unknown as Network);
+
+        expect(latency).greaterThanOrEqual(0);
+        expect(latency).lessThanOrEqual(100);
     });
 });

@@ -46,10 +46,10 @@ export class NetworkView {
         private _netowork: Network,
         options: Partial<NetworkViewOptions> = {}
     ) {
+        this._options = { ...defaultOptions, ...options };
         _netowork.nodes.forEach(node => this.addNode(node));
         this._nodeSubscription = _netowork.subscribeNodes(event => this.onNode(event));
         this._packetSubscription = _netowork.subscribePackets(event => this.onPacket(event));
-        this._options = { ...defaultOptions, ...options };
     }
 
     destroy(): void {
@@ -89,13 +89,13 @@ export class NetworkView {
         this._nodes = [...this._nodes, this.createNodeView(node)];
         this.arrangeNodes(this._options.nodeArrageRadius);
         this._nodeCounter++;
-        this._nodesSubscriptions?.forEach(callback => callback());
+        this._nodesSubscriptions.forEach(callback => callback());
     }
 
     private removeNode(node: INode) {
         this._nodes = this._nodes.filter(n => n.id !== node.id);
         this.arrangeNodes(this._options.nodeArrageRadius);
-        this._nodesSubscriptions?.forEach(callback => callback());
+        this._nodesSubscriptions.forEach(callback => callback());
     }
 
     private arrangeNodes(radius: number) {
@@ -138,11 +138,11 @@ export class NetworkView {
         }
 
         this._packets = [...this._packets, newPacketView];
-        this._packetsSubscriptions?.forEach(callback => callback());
+        this._packetsSubscriptions.forEach(callback => callback());
     }
 
     private removePacket(packet: Packet<unknown>) {
         this._packets = this._packets.filter(p => p.id !== packet.metadata.id);
-        this._packetsSubscriptions?.forEach(callback => callback());
+        this._packetsSubscriptions.forEach(callback => callback());
     }
 }

@@ -2,6 +2,7 @@ import { NodeView, NodeViewOptions } from './../src/views/node-view';
 import { NetworkView } from './../src/views/network-view';
 import { Network, NetworkHistory, Node, Timeline } from '@gobixm/sim';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 
 describe('network view', () => {
     it('arranges on new node', () => {
@@ -100,5 +101,62 @@ describe('network view', () => {
             color: '#eeeeee',
             radius: 40
         });
+    });
+
+    it('subscribe nodes', () => {
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        network.start();
+        const networkView = new NetworkView(network);
+        const node = new Node<string>('1', network, 'state');
+        const nodesCallback = sinon.fake(()=>{
+            //
+        });
+        const sub = networkView.subscribeNodes(nodesCallback);
+
+        network.registerNode(node);
+        network.unregisterNode(node.id);
+
+        sub();
+        network.stop();
+        networkView.destroy();
+
+        expect(nodesCallback.callCount).equals(2);
+    });
+
+    it('subscribe packets', () => {
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        network.start();
+        const networkView = new NetworkView(network);
+        const node = new Node<string>('1', network, 'state');
+        const packetsCallback = sinon.fake(()=>{
+            //
+        });
+        const sub = networkView.subscribePackets(packetsCallback);
+
+        network.registerNode(node);
+        node.send<string>('foo', 'body', node, 0);
+        timeline.tick(1);
+
+        sub();
+        network.stop();
+        networkView.destroy();
+
+        expect(packetsCallback.callCount).equals(2);    
+    });
+
+    it('initial nodes added', () => {
+        const timeline = new Timeline();
+        const network = new Network(timeline, new NetworkHistory());
+        network.start();
+        const node = new Node<string>('1', network, 'state');
+        network.registerNode(node);
+
+        const networkView = new NetworkView(network);
+        network.stop();
+        networkView.destroy();
+
+        expect(networkView.nodes).length(1);    
     });
 });
