@@ -7,6 +7,7 @@ import { PingPongVis } from './ping-pong/ping-pong-vis';
 import styles from './App.module.css';
 import { RequestReply } from './req-rep/req-rep';
 import { Survey } from './survey/survey';
+import { PubSub } from './pub-sub/pub-sub';
 
 export const App: FunctionComponent = () => {
   return (
@@ -29,6 +30,11 @@ export const App: FunctionComponent = () => {
             </RouterLink>
           </Button>
           <Button>
+            <RouterLink to="/pub-sub" style={{ textDecoration: 'none' }}>
+              Pub-Sub
+            </RouterLink>
+          </Button>
+          <Button>
             <RouterLink to="/survey" style={{ textDecoration: 'none' }}>
               Survey
             </RouterLink>
@@ -43,6 +49,7 @@ export const App: FunctionComponent = () => {
           <Route path="/" exact component={RequestReply} />
           <Route path="/ping-pong" exact component={PingPongVis} />
           <Route path="/req-rep" exact component={RequestReply} />
+          <Route path="/pub-sub" exact component={PubSub} />
           <Route path="/survey" exact component={Survey} />
         </div>
       </div>
