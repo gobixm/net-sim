@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import { NodeView } from '@gobixm/simviz';
+import { defaultJsonReplacer } from '../common/json-replacer';
 
 interface NodeStateVisProps {
     nodeView: NodeView;
@@ -16,7 +17,7 @@ export const NodeStateVis: FunctionComponent<NodeStateVisProps> = ({ nodeView })
                 border: 'solid 1px black'
             }}>
                 <pre style={{ fontSize: '13px' }}>
-                    {JSON.stringify(nodeView.state, null, 2)}
+                    {JSON.stringify(nodeView.state, defaultJsonReplacer, 2)}
                 </pre>
             </div>
         </foreignObject>

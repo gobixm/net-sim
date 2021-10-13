@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import { PacketView } from '@gobixm/simviz';
+import { defaultJsonReplacer } from '../common/json-replacer';
 
 interface PacketStateVisProps {
     packetView: PacketView;
@@ -19,7 +20,7 @@ export const PacketStateVis: FunctionComponent<PacketStateVisProps> = ({ packetV
                     {packetView.type}
                 </p>
                 <pre style={{ fontSize: '13px' }}>
-                    {JSON.stringify(packetView.body, null, 2)}
+                    {JSON.stringify(packetView.body, defaultJsonReplacer, 2)}
                 </pre>
             </div>
         </foreignObject>

@@ -17,6 +17,9 @@ export const App: FunctionComponent = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Network Simulator
           </Typography>
+          <Typography component="div" sx={{ flexGrow: 1 }}>
+            You can click on Node to view it state.
+          </Typography>
         </Toolbar>
       </AppBar>
       <div className={styles.main}>
