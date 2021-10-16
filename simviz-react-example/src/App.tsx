@@ -8,6 +8,7 @@ import styles from './App.module.css';
 import { RequestReply } from './req-rep/req-rep';
 import { Survey } from './survey/survey';
 import { PubSub } from './pub-sub/pub-sub';
+import { Bgp } from './bgp/bgp';
 
 export const App: FunctionComponent = () => {
   return (
@@ -43,6 +44,11 @@ export const App: FunctionComponent = () => {
             </RouterLink>
           </Button>
           <Button>
+            <RouterLink to="/bgp" style={{ textDecoration: 'none' }}>
+              Byzantine Generals
+            </RouterLink>
+          </Button>
+          <Button>
             <RouterLink to="/ping-pong" style={{ textDecoration: 'none' }}>
               Ping Pong
             </RouterLink>
@@ -54,6 +60,7 @@ export const App: FunctionComponent = () => {
           <Route path="/req-rep" exact component={RequestReply} />
           <Route path="/pub-sub" exact component={PubSub} />
           <Route path="/survey" exact component={Survey} />
+          <Route path="/bgp" exact component={Bgp} />
         </div>
       </div>
     </BrowserRouter >
