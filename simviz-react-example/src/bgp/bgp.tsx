@@ -18,7 +18,7 @@ export const Bgp: FunctionComponent = () => {
 
     return (
         <PatternPage title="Byzantine Generals Problem"
-            brief="General sends command to lieutenants. They will win either if majority will attack, or survive if majority is retreat. But there is one traitor who tries to mess the decision."
+            brief="General sends command to lieutenants. They will win either if majority will attack, or survive if majority is retreat. But there is traitor who tries to mess the decision. The solution is to each lieutenant sends to others what he heared from general. After all messages received lieutenant looks for majority. Such a solution requires 3m+1 nodes to tolerate m traitors."
             historyView={sim.current.historyView}
             network={sim.current.network}
             networkView={sim.current.networkView}

@@ -1,7 +1,7 @@
 import { AppBar, Button, Toolbar, Typography } from '@mui/material';
 import { FunctionComponent } from 'react';
 import {
-  BrowserRouter, Link as RouterLink, Route
+  HashRouter, Link as RouterLink, Route
 } from 'react-router-dom';
 import { PingPongVis } from './ping-pong/ping-pong-vis';
 import styles from './App.module.css';
@@ -12,7 +12,7 @@ import { Bgp } from './bgp/bgp';
 
 export const App: FunctionComponent = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -63,6 +63,6 @@ export const App: FunctionComponent = () => {
           <Route path="/bgp" exact component={Bgp} />
         </div>
       </div>
-    </BrowserRouter >
+    </HashRouter >
   );
 };

@@ -8,7 +8,7 @@ interface NodeStateVisProps {
 
 export const NodeStateVis: FunctionComponent<NodeStateVisProps> = ({ nodeView }) => {
     return (
-        <foreignObject style={{ width: '100%', height: '100%' }}>
+        <foreignObject style={{ width: '100%', height: '100%', pointerEvents: 'none' }}>
             <div style={{
                 display: 'inline-block',
                 padding: '8px',

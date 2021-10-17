@@ -12,6 +12,10 @@ interface NodeState {
     decision: Action | undefined;
 }
 
+interface GeneralState {
+    command?: Action;
+}
+
 function createSimulation(networkViewOptions: Partial<NetworkViewOptions>) {
     const timeline = new Timeline();
     const history = new NetworkHistory();
@@ -20,7 +24,7 @@ function createSimulation(networkViewOptions: Partial<NetworkViewOptions>) {
     const historyView = new HistoryView(network, history);
 
 
-    const general = new Node<unknown>('general', network, { subs: {} });
+    const general = new Node<GeneralState>('general', network, {});
     const alice = new Node<NodeState>('alice', network, { commands: new Map(), decision: undefined });
     const bob = new Node<NodeState>('bob', network, { commands: new Map(), decision: undefined });
     const traitor = new Node<NodeState>('traitor', network, { commands: new Map(), decision: undefined });
@@ -70,6 +74,7 @@ function createSimulation(networkViewOptions: Partial<NetworkViewOptions>) {
         networkView,
         historyView,
         sendCommand: (action: Action) => {
+            general.state.command = action;
             network.nodes.filter(node => node.id !== general.id)
                 .forEach(node => network.sendPacket<Command>('command', { action: action }, general, node));
         }

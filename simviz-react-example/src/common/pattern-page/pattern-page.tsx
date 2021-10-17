@@ -41,7 +41,7 @@ export const PatternPage: FunctionComponent<PatternPageProps> = (props) => {
                 <TimePanel timeline={props.timeline} onTime={handleTime} onTimescale={handleTimeScale}></TimePanel>
             </div>
             <div className={styles.visualization}>
-                <NetworkVis timeline={props.timeline} networkView={props.networkView} height={600} width={600} timescale={timescale} time={time}></NetworkVis>
+                <NetworkVis networkView={props.networkView} height={600} width={600} timescale={timescale} time={time}></NetworkVis>
                 <HistoryPanel historyView={props.historyView} network={props.network} />
             </div>
         </div>
